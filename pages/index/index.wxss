@@ -1,0 +1,169 @@
+.page {
+  min-height: 100vh;
+  padding: 48rpx 40rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #F5F7FB;
+}
+
+/* 卡片 */
+.card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #2A2C31;
+  border-radius: 32rpx;
+  box-shadow: 0 24rpx 60rpx -10rpx rgba(74, 222, 128, 0.25),
+              0 10rpx 30rpx rgba(0, 0, 0, 0.08);
+  color: #fff;
+  padding: 40rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease-out;
+  overflow: hidden;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  right: -160rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 360rpx;
+  height: 360rpx;
+  background: radial-gradient(circle, rgba(74, 222, 128, 0.45) 0%, rgba(74, 222, 128, 0) 70%);
+  pointer-events: none;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.menu {
+  padding: 6rpx 14rpx;
+  font-size: 36rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 10rpx;
+}
+
+.q-text {
+  font-size: 44rpx;
+  line-height: 1.5;
+  font-weight: 600;
+  color: #fff;
+  text-align: left;
+  word-break: break-word;
+}
+
+.a-text {
+  font-size: 40rpx;
+  line-height: 1.55;
+  color: #A7F3D0;
+  text-align: center;
+  word-break: break-word;
+}
+
+.card-footer {
+  text-align: center;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* 底部操作栏 */
+.toolbar {
+  margin-top: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10rpx;
+}
+
+.tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2rpx solid #E5E7EF;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.tool-btn:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+.circle {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+}
+
+.arrow {
+  font-size: 40rpx;
+  color: #5B7CFA;
+}
+
+.pill {
+  min-width: 140rpx;
+  height: 84rpx;
+  border-radius: 48rpx;
+  padding: 0 26rpx;
+  gap: 12rpx;
+}
+
+.pill .count {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.wrong .icon-x {
+  font-size: 34rpx;
+  color: #EF4444;
+  margin-right: 10rpx;
+  font-weight: 700;
+}
+
+.right .icon-ok {
+  font-size: 34rpx;
+  color: #22C55E;
+  margin-left: 10rpx;
+  font-weight: 700;
+}
+
+/* 来源标签 */
+.source-tag {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* 加载遮罩 */
+.loading-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.loading-text {
+  color: #fff;
+  font-size: 32rpx;
+}
