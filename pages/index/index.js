@@ -320,24 +320,22 @@ Page({
     wx.showToast({ title: '已打乱顺序', icon: 'none' })
   },
 
-  // 发音功能：使用 Google TTS（免费、支持多语言）
+  // 发音功能：使用有道词典 TTS（国内可用）
   playTTS() {
     const item = this.data.list[this.data.index]
     if (!item || !this.data.ttsLang) return
 
-    // 从题目中提取要发音的文本
     let text = ''
     const lang = this.data.ttsLang
 
     if (lang === 'ja') {
-      // 日语：提取假名部分（ / 前面的平假名）
-      const m = item.q.match(/^([ぁ-ん]+|[ァ-ヶ]+|[\u4e00-\u9fff]+)/)
+      // 日语：提取假名部分
+      const m = item.q.match(/^([ぁ-んァ-ヶー\u4e00-\u9fff]+)/)
       if (m) text = m[1]
       else text = item.q.split('/')[0].trim().split(' ')[0]
     } else if (lang === 'fr') {
-      // 法语：尝试从答案里提取法语内容
+      // 法语：从答案提取法语内容
       const aText = item.a || ''
-      // 如果答案像是法语句子/词汇
       if (/[a-zàâçéèêëîïôûùüÿñæœ]/i.test(aText)) {
         text = aText.replace(/[。．]/g, '').trim()
       } else {
@@ -349,8 +347,11 @@ Page({
 
     if (!text) { wx.showToast({ title: '无法识别发音内容', icon: 'none' }); return }
 
-    // 使用 Google Translate TTS
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(text)}`
+    // 有道词典 TTS 接口（国内稳定可用）
+    // le=jap 日语, le=fr 法语, le=eng 英语
+    const leMap = { ja: 'jap', fr: 'fr', en: 'eng' }
+    const le = leMap[lang] || 'eng'
+    const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=${le}&type=2`
 
     if (this._audioCtx) {
       this._audioCtx.stop()
