@@ -5,17 +5,17 @@ const DECKS = [
   {
     id: 'french', name: '法语学习', icon: '🇫🇷',
     csvUrl: 'https://gist.githubusercontent.com/canaaniteL/f35c54a90eddb22434ad275ab866b149/raw/flashcards.csv',
-    format: 'csv'
+    format: 'csv', ttsLang: 'fr'
   },
   {
     id: 'algorithm', name: '算法学习', icon: '🧮',
     csvUrl: 'https://gist.githubusercontent.com/canaaniteL/85a5119037df5a08196c17e5557faffc/raw/gistfile1.txt',
-    format: 'leetcode-md'
+    format: 'leetcode-md', ttsLang: ''
   },
   {
     id: 'japanese', name: '日语学习', icon: '🇯🇵',
     csvUrl: 'https://gist.githubusercontent.com/canaaniteL/3a8c50a90bb888a6c14b9a0e5a33a9d8/raw/Japanese50sound.csv',
-    format: 'csv'
+    format: 'csv', ttsLang: 'ja'
   }
 ]
 
@@ -36,6 +36,8 @@ Page({
     showRating: false,
     currentRating: 0,
     mode: 'normal',
+    hasTTS: false,
+    ttsLang: '',
     ratedCount: 0,
     avgScore: 0,
     weakCount: 0,
@@ -64,7 +66,12 @@ Page({
     const deck = DECKS.find(d => d.id === deckId)
     if (!deck) return
     wx.setStorageSync('fc_current_deck', deckId)
-    this.setData({ currentDeckId: deckId, currentDeckName: deck.icon + ' ' + deck.name })
+    this.setData({
+      currentDeckId: deckId,
+      currentDeckName: deck.icon + ' ' + deck.name,
+      hasTTS: !!deck.ttsLang,
+      ttsLang: deck.ttsLang || ''
+    })
 
     if (deck.csvUrl) {
       this.fetchDeckData(deck)
@@ -299,6 +306,52 @@ Page({
 
   showCode() {
     this.setData({ showAnswer: 2 })
+  },
+
+  // 发音功能：使用 Google TTS（免费、支持多语言）
+  playTTS() {
+    const item = this.data.list[this.data.index]
+    if (!item || !this.data.ttsLang) return
+
+    // 从题目中提取要发音的文本
+    let text = ''
+    const lang = this.data.ttsLang
+
+    if (lang === 'ja') {
+      // 日语：提取假名部分（ / 前面的平假名）
+      const m = item.q.match(/^([ぁ-ん]+|[ァ-ヶ]+|[\u4e00-\u9fff]+)/)
+      if (m) text = m[1]
+      else text = item.q.split('/')[0].trim().split(' ')[0]
+    } else if (lang === 'fr') {
+      // 法语：尝试从答案里提取法语内容
+      const aText = item.a || ''
+      // 如果答案像是法语句子/词汇
+      if (/[a-zàâçéèêëîïôûùüÿñæœ]/i.test(aText)) {
+        text = aText.replace(/[。．]/g, '').trim()
+      } else {
+        text = item.q
+      }
+    } else {
+      text = item.q
+    }
+
+    if (!text) { wx.showToast({ title: '无法识别发音内容', icon: 'none' }); return }
+
+    // 使用 Google Translate TTS
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(text)}`
+
+    if (this._audioCtx) {
+      this._audioCtx.stop()
+      this._audioCtx.destroy()
+    }
+    const audio = wx.createInnerAudioContext()
+    this._audioCtx = audio
+    audio.src = url
+    audio.play()
+    audio.onError((err) => {
+      console.error('TTS error:', err)
+      wx.showToast({ title: '发音失败', icon: 'none' })
+    })
   },
 
   onSwiperChange(e) {
