@@ -49,7 +49,7 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
 .rating-badge { width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
 .card-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 8px; }
-.q-text { font-size: 22px; line-height: 1.5; font-weight: 600; color: #fff; text-align: left; word-break: break-word; }
+.q-text { font-size: 20px; line-height: 1.5; font-weight: 600; color: #fff; text-align: left; word-break: break-word; }
 .a-text { font-size: 20px; line-height: 1.55; color: #A7F3D0; text-align: center; word-break: break-word; }
 
 .card-footer { text-align: center; font-size: 13px; color: rgba(255,255,255,0.45); display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -319,13 +319,15 @@ function parseLeetCodeMD(raw) {
     const cd = block.match(/```(?:cpp|c\+\+|java|python|javascript)?\s*\n([\s\S]+?)```/)
     if (cd) code = cd[1].trim()
 
+    let front = `【LeetCode ${num}】${name}`
+    if (desc) front += '\n\n' + desc
+
     let answer = ''
-    if (desc) answer += desc + '\n\n'
     if (idea) answer += '💡 ' + idea
     if (cplx) answer += '\n\n⏱ ' + cplx
     if (!answer) answer = name
 
-    questions.push({ q: `【LeetCode ${num}】${name}`, a: answer, code: code })
+    questions.push({ q: front, a: answer, code: code })
   }
   return questions
 }
@@ -401,7 +403,7 @@ function renderCards() {
       content = `<span class="a-text">${esc(item.a).replace(/\n/g,'<br>')}</span>`
       hintText = hasCode ? '返回题面' : '返回题面'
     } else {
-      content = `<span class="q-text">${esc(item.q)}</span>`
+      content = `<span class="q-text">${esc(item.q).replace(/\n/g,'<br>')}</span>`
       hintText = '查看答案'
     }
     const codeBtn = (isActive && showAnswer === 1 && hasCode) ? `<span class="code-link" onclick="event.stopPropagation();showCode()">📝 查看代码</span>` : ''
