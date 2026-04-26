@@ -21,8 +21,10 @@
       class="card-swiper"
       current="{{index}}"
       bindchange="onSwiperChange"
-      duration="250"
+      duration="200"
       easing-function="easeOutCubic"
+      displayMultipleItems="1"
+      skip-hidden-item-layout="{{false}}"
     >
       <swiper-item wx:for="{{list}}" wx:key="index">
         <view class="card" bindtap="toggleAnswer">
