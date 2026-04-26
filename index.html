@@ -52,8 +52,19 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
 .q-text { font-size: 22px; line-height: 1.5; font-weight: 600; color: #fff; text-align: left; word-break: break-word; }
 .a-text { font-size: 20px; line-height: 1.55; color: #A7F3D0; text-align: center; word-break: break-word; }
 
-.card-footer { text-align: center; font-size: 13px; color: rgba(255,255,255,0.45); }
+.card-footer { text-align: center; font-size: 13px; color: rgba(255,255,255,0.45); display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; }
 .hint { padding: 8px 16px; cursor: pointer; }
+.code-link { font-size: 12px; color: #A7F3D0; cursor: pointer; padding: 6px 12px; background: rgba(74,222,128,0.15); border-radius: 12px; }
+.code-link:active { opacity: 0.7; }
+
+/* 代码块 */
+.code-block {
+  width: 100%; text-align: left; font-size: 12px; line-height: 1.6;
+  color: #e2e8f0; background: rgba(0,0,0,0.3); border-radius: 10px;
+  padding: 14px; overflow: auto; max-height: 100%; white-space: pre;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* 评分面板 */
 .rating-panel { background: #fff; border-radius: 16px; padding: 16px 20px; margin-top: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0; }
@@ -195,6 +206,7 @@ const DECKS = [
     icon: '🇫🇷',
     desc: '发音、动词变位、词汇、语法',
     csvUrl: 'https://gist.githubusercontent.com/canaaniteL/f35c54a90eddb22434ad275ab866b149/raw/flashcards.csv',
+    format: 'csv',
     builtin: [
       {q:'法语字母组合 ou 的发音是什么？',a:'/u/（类似于汉语拼音的 u）。'},
       {q:'法语字母组合 oi 的发音是什么？',a:'/wa/。'},
@@ -206,31 +218,18 @@ const DECKS = [
     id: 'algorithm',
     name: '算法学习',
     icon: '🧮',
-    desc: '数据结构、排序、搜索、动态规划',
-    csvUrl: '', // 后续可加 Gist 链接
+    desc: 'LeetCode 高频题 · 数据结构与算法',
+    csvUrl: 'https://gist.githubusercontent.com/canaaniteL/85a5119037df5a08196c17e5557faffc/raw/gistfile1.txt',
+    format: 'leetcode-md',
     builtin: [
-      {q:'什么是时间复杂度？',a:'描述算法执行时间随输入规模增长的变化趋势，用大O表示法。'},
-      {q:'数组和链表的主要区别是什么？',a:'数组连续存储、随机访问O(1)、插入O(n)；链表非连续、访问O(n)、插入O(1)。'},
-      {q:'快速排序的平均时间复杂度是？',a:'O(n log n)，最坏情况O(n²)。'},
-      {q:'什么是哈希表？',a:'通过哈希函数将键映射到数组索引的数据结构，平均查找/插入/删除为O(1)。'},
-      {q:'二分查找的前提条件是什么？',a:'数据必须是有序的。时间复杂度O(log n)。'},
-      {q:'什么是动态规划（DP）？',a:'将问题分解为重叠子问题，通过记忆化或自底向上的方式避免重复计算。'},
-      {q:'BFS 和 DFS 分别用什么数据结构实现？',a:'BFS 用队列（Queue），DFS 用栈（Stack）或递归。'},
-      {q:'什么是稳定排序？举例。',a:'相等元素的相对顺序不变。例：归并排序、冒泡排序、插入排序。'},
-      {q:'栈（Stack）的特点是什么？',a:'后进先出（LIFO），只能在栈顶进行 push 和 pop 操作。'},
-      {q:'二叉搜索树（BST）的性质是什么？',a:'左子树所有节点值 < 根节点值 < 右子树所有节点值。中序遍历得到有序序列。'},
-      {q:'什么是贪心算法？',a:'每一步都选择当前最优解，不回溯。适用于局部最优能导出全局最优的问题。'},
-      {q:'堆（Heap）的特点是什么？',a:'完全二叉树，最大堆中父节点≥子节点，最小堆反之。插入/删除O(log n)，取极值O(1)。'},
-      {q:'归并排序的核心思想是什么？',a:'分治法：将数组一分为二，递归排序后合并。时间O(n log n)，空间O(n)。'},
-      {q:'什么是回溯算法？',a:'通过尝试所有可能的选择，发现不满足条件时撤销选择（回溯），继续尝试其他路径。'},
-      {q:'图的邻接表和邻接矩阵各自的优缺点？',a:'邻接表：省空间O(V+E)，遍历邻居快；邻接矩阵：查边O(1)，但空间O(V²)。'},
+      {q:'【LeetCode 1】两数之和',a:'哈希表存储已遍历数字及下标，查找 target - nums[i]。时间O(N)。',code:''},
     ]
   }
 ]
 
 // ==================== 状态 ====================
 let currentDeckId = ''
-let list = [], allList = [], index = 0, total = 0, showAnswer = false
+let list = [], allList = [], index = 0, total = 0, showAnswer = 0
 let rightCount = 0, wrongCount = 0, source = 'builtin', mode = 'normal'
 let ratings = {}, showRatingPanelFlag = false
 let startX = 0, startY = 0, dx = 0, isSwiping = false, isHorizontal = null
@@ -257,11 +256,75 @@ function loadDeck(deckId) {
   document.title = deck.name + ' - 闪卡刷题'
 
   if (deck.csvUrl) {
-    fetchCSV(deck.csvUrl, deck.builtin)
+    fetchDeckData(deck)
   } else {
     const cached = load(storageKey('cache'))
     applyQuestions(cached && cached.length ? cached : deck.builtin, cached ? 'local' : 'builtin')
   }
+}
+
+function fetchDeckData(deck) {
+  show('loading')
+  fetch(deck.csvUrl).then(r => r.ok ? r.text() : Promise.reject()).then(text => {
+    let q = []
+    if (deck.format === 'leetcode-md') {
+      q = parseLeetCodeMD(text)
+    } else {
+      q = parseCSV(text)
+    }
+    if (q.length) { save(storageKey('cache'), q); applyQuestions(q, 'remote'); return }
+    doFallback(deck.builtin)
+  }).catch(() => doFallback(deck.builtin))
+}
+
+// ==================== LeetCode Markdown 解析器 ====================
+function parseLeetCodeMD(text) {
+  const questions = []
+  // 按 ### 【LeetCode 拆分题目块
+  const blocks = text.split(/\n###\s+/)
+  for (const block of blocks) {
+    const match = block.match(/^【LeetCode\s+(\d+)】(.+?)$/m)
+    if (!match) continue
+    const num = match[1]
+    const name = match[2].trim()
+
+    // 提取题目描述
+    let desc = ''
+    const descMatch = block.match(/\*\*题目\*\*[：:](.+?)(?=\n\n|\n\*\*)/s)
+    if (descMatch) desc = descMatch[1].trim()
+
+    // 提取核心思路
+    let idea = ''
+    const ideaMatch = block.match(/\*\*核心思路\*\*[：:](.+?)(?=\n\n```|\n-\s+\*\*时间)/s)
+    if (ideaMatch) idea = ideaMatch[1].trim()
+
+    // 提取复杂度
+    let complexity = ''
+    const cmpMatch = block.match(/\*\*时间复杂度\*\*[：:](.+?)$/m)
+    if (cmpMatch) complexity = cmpMatch[1].trim()
+    // 也尝试 "- **时间复杂度**" 格式
+    const cmpMatch2 = block.match(/-\s+\*\*时间复杂度\*\*[：:](.+?)(?:\s+\*\*空间|$)/m)
+    if (!complexity && cmpMatch2) complexity = cmpMatch2[1].trim()
+
+    // 提取代码块
+    let code = ''
+    const codeMatch = block.match(/```(?:cpp|c\+\+|java|python|javascript)?\n([\s\S]+?)```/)
+    if (codeMatch) code = codeMatch[1].trim()
+
+    // 构建闪卡
+    const front = `【LeetCode ${num}】${name}`
+    let answer = ''
+    if (desc) answer += desc + '\n\n'
+    if (idea) answer += '💡 ' + idea
+    if (complexity) answer += '\n\n⏱ ' + complexity
+
+    questions.push({
+      q: front,
+      a: answer || '核心算法：' + name,
+      code: code
+    })
+  }
+  return questions
 }
 
 function showDeckPicker() {
@@ -288,17 +351,8 @@ function applyQuestions(q, src) {
   const saved = load(storageKey('state')) || {}
   index = Math.min(saved.index || 0, Math.max(total - 1, 0))
   rightCount = saved.rightCount || 0; wrongCount = saved.wrongCount || 0
-  showAnswer = false; mode = 'normal'; showRatingPanelFlag = false
+  showAnswer = 0; mode = 'normal'; showRatingPanelFlag = false
   hide('loading'); render()
-}
-
-function fetchCSV(url, fallbackBuiltin) {
-  show('loading')
-  fetch(url).then(r => r.ok ? r.text() : Promise.reject()).then(text => {
-    const q = parseCSV(text)
-    if (q.length) { save(storageKey('cache'), q); applyQuestions(q, 'remote'); return }
-    doFallback(fallbackBuiltin)
-  }).catch(() => doFallback(fallbackBuiltin))
 }
 
 function doFallback(fallbackBuiltin) {
@@ -335,11 +389,23 @@ function renderCards() {
   track.innerHTML = list.map((item, i) => {
     const r = ratings[i], rColor = r ? (r<=2?'#EF4444':r<=3?'#EAB308':'#22C55E') : ''
     const isActive = i === index
-    const content = isActive && showAnswer ? `<span class="a-text">${esc(item.a)}</span>` : `<span class="q-text">${esc(item.q)}</span>`
+    const hasCode = item.code
+    let content = '', hintText = ''
+    if (isActive && showAnswer === 2 && hasCode) {
+      content = `<pre class="code-block"><code>${esc(item.code)}</code></pre>`
+      hintText = '返回题面'
+    } else if (isActive && showAnswer === 1) {
+      content = `<span class="a-text">${esc(item.a).replace(/\n/g,'<br>')}</span>`
+      hintText = hasCode ? '返回题面' : '返回题面'
+    } else {
+      content = `<span class="q-text">${esc(item.q)}</span>`
+      hintText = '查看答案'
+    }
+    const codeBtn = (isActive && showAnswer === 1 && hasCode) ? `<span class="code-link" onclick="event.stopPropagation();showCode()">📝 查看代码</span>` : ''
     return `<div class="card-slide"><div class="card" onclick="toggleAnswer()">
       <div class="card-header"><span>${i+1} / ${total}</span><div class="header-right">${r?`<div class="rating-badge" style="background:${rColor}">${r}</div>`:''}</div></div>
       <div class="card-body">${content}</div>
-      <div class="card-footer"><span class="hint">${isActive&&showAnswer?'收起答案':'查看答案'}</span></div>
+      <div class="card-footer"><span class="hint">${hintText}</span>${codeBtn}</div>
     </div></div>`
   }).join('')
   track.style.transform = `translateX(-${index * 100}%)`; track.classList.remove('swiping')
@@ -367,9 +433,18 @@ function updateRatingPanel() {
 }
 
 // ==================== 操作 ====================
-function toggleAnswer() { showAnswer = !showAnswer; render() }
-function goPrev() { if(index<=0)return; index--; showAnswer=false; showRatingPanelFlag=false; persist(); render() }
-function goNext() { if(index>=total-1)return; index++; showAnswer=false; showRatingPanelFlag=false; persist(); render() }
+// showAnswer: 0=题面, 1=思路/答案, 2=代码
+function toggleAnswer() {
+  const item = list[index]
+  const hasCode = item && item.code
+  if (showAnswer === 0) showAnswer = 1
+  else if (showAnswer === 1 && hasCode) showAnswer = 2
+  else showAnswer = 0
+  render()
+}
+function showCode() { showAnswer = 2; render() }
+function goPrev() { if(index<=0)return; index--; showAnswer=0; showRatingPanelFlag=false; persist(); render() }
+function goNext() { if(index>=total-1)return; index++; showAnswer=0; showRatingPanelFlag=false; persist(); render() }
 function markWrong() { wrongCount++; persist(); if(index<total-1) setTimeout(goNext,160); else updateToolbar() }
 function markRight() { rightCount++; persist(); if(index<total-1) setTimeout(goNext,160); else updateToolbar() }
 function toggleRating() { showRatingPanelFlag = !showRatingPanelFlag; updateRatingPanel() }
@@ -389,8 +464,8 @@ function initSwipe() {
   a.addEventListener('touchend', ()=>{
     if(!isSwiping)return; isSwiping=false
     const w=document.getElementById('swiperArea').offsetWidth, th=w*0.15
-    if(dx<-th&&index<total-1){index++;showAnswer=false;showRatingPanelFlag=false;persist()}
-    else if(dx>th&&index>0){index--;showAnswer=false;showRatingPanelFlag=false;persist()}
+    if(dx<-th&&index<total-1){index++;showAnswer=0;showRatingPanelFlag=false;persist()}
+    else if(dx>th&&index>0){index--;showAnswer=0;showRatingPanelFlag=false;persist()}
     render()
   })
 }
@@ -400,7 +475,7 @@ function showMenuPanel() {
   const items = [
     {text: mode==='review'?'退出复习模式':'复习薄弱题', action: toggleReview},
     {text: '学习统计', action: showStatsPanel},
-    {text: '刷新题库', action: ()=>{ const d=DECKS.find(d=>d.id===currentDeckId); if(d&&d.csvUrl) fetchCSV(d.csvUrl,d.builtin); else alert('当前题库无云端数据源') }},
+    {text: '刷新题库', action: ()=>{ const d=DECKS.find(d=>d.id===currentDeckId); if(d&&d.csvUrl) fetchDeckData(d); else alert('当前题库无云端数据源') }},
     {text: '重置当前题库进度', action: resetAll, cls:'danger'},
   ]
   const el = document.getElementById('menuList')
@@ -411,14 +486,14 @@ function showMenuPanel() {
 function closeMenu() { hide('menuOverlay') }
 
 function toggleReview() {
-  if (mode==='review') { list=allList; total=list.length; index=0; showAnswer=false; mode='normal' }
-  else { const r=allList.filter((_,i)=>!ratings[i]||ratings[i]<=2); if(!r.length){alert('没有需要复习的题目！');return}; list=r;total=r.length;index=0;showAnswer=false;mode='review' }
+  if (mode==='review') { list=allList; total=list.length; index=0; showAnswer=0; mode='normal' }
+  else { const r=allList.filter((_,i)=>!ratings[i]||ratings[i]<=2); if(!r.length){alert('没有需要复习的题目！');return}; list=r;total=r.length;index=0;showAnswer=0;mode='review' }
   render()
 }
 function resetAll() {
   if(!confirm('将清空当前题库的进度、评分和计数，确定吗？'))return
   localStorage.removeItem(storageKey('ratings')); localStorage.removeItem(storageKey('state'))
-  ratings={}; index=0; rightCount=0; wrongCount=0; showAnswer=false; render()
+  ratings={}; index=0; rightCount=0; wrongCount=0; showAnswer=0; render()
 }
 
 // ==================== 统计 ====================
