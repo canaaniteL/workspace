@@ -1,5 +1,4 @@
 const builtinFrench = require('../../data/questions.js')
-const plugin = requirePlugin('WechatSI')
 
 // 题库分类配置
 const DECKS = [
@@ -321,7 +320,7 @@ Page({
     wx.showToast({ title: '已打乱顺序', icon: 'none' })
   },
 
-  // 发音功能：使用微信同声传译插件 TTS
+  // 发音功能：有道词典 TTS，先下载再播放
   playTTS() {
     const item = this.data.list[this.data.index]
     if (!item || !this.data.ttsLang) return
@@ -330,12 +329,10 @@ Page({
     const lang = this.data.ttsLang
 
     if (lang === 'ja') {
-      // 日语：提取假名部分
       const m = item.q.match(/^([ぁ-んァ-ヶー\u4e00-\u9fff]+)/)
       if (m) text = m[1]
       else text = item.q.split('/')[0].trim().split(' ')[0]
     } else if (lang === 'fr') {
-      // 法语：从答案提取法语内容
       const aText = item.a || ''
       if (/[a-zàâçéèêëîïôûùüÿñæœ]/i.test(aText)) {
         text = aText.replace(/[。．]/g, '').trim()
@@ -348,25 +345,33 @@ Page({
 
     if (!text) { wx.showToast({ title: '无法识别发音内容', icon: 'none' }); return }
 
-    // 同声传译插件的语言代码：zh_CN / en_US / ja_JP / fr_FR
-    const langMap = { ja: 'ja_JP', fr: 'fr_FR', en: 'en_US' }
-    const ttsLang = langMap[lang] || 'en_US'
+    const leMap = { ja: 'jap', fr: 'fr', en: 'eng' }
+    const le = leMap[lang] || 'eng'
+    const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=${le}&type=2`
 
-    plugin.textToSpeech({
-      lang: ttsLang,
-      content: text,
+    wx.showLoading({ title: '加载发音...' })
+    wx.downloadFile({
+      url,
       success: (res) => {
-        if (res.filename) {
+        wx.hideLoading()
+        if (res.statusCode === 200 && res.tempFilePath) {
           if (this._audioCtx) { this._audioCtx.stop(); this._audioCtx.destroy() }
           const audio = wx.createInnerAudioContext()
           this._audioCtx = audio
-          audio.src = res.filename
+          audio.src = res.tempFilePath
           audio.play()
+          audio.onError((err) => {
+            console.error('Audio play error:', err)
+            wx.showToast({ title: '播放失败', icon: 'none' })
+          })
+        } else {
+          wx.showToast({ title: '发音下载失败', icon: 'none' })
         }
       },
       fail: (err) => {
-        console.error('TTS fail:', err)
-        wx.showToast({ title: '发音失败', icon: 'none' })
+        wx.hideLoading()
+        console.error('Download TTS fail:', err)
+        wx.showToast({ title: '网络错误', icon: 'none' })
       }
     })
   },
