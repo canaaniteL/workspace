@@ -278,51 +278,54 @@ function fetchDeckData(deck) {
 }
 
 // ==================== LeetCode Markdown 解析器 ====================
-function parseLeetCodeMD(text) {
+function parseLeetCodeMD(raw) {
+  // 去除反斜杠转义
+  let text = raw
+  text = text.replace(/\\\*\\\*/g, '**')
+  text = text.replace(/\\`\\`\\`/g, '```')
+  text = text.replace(/\\`/g, '`')
+  text = text.replace(/\\\[/g, '[').replace(/\\\]/g, ']')
+  text = text.replace(/\\_/g, '_')
+  text = text.replace(/\\\*/g, '*')
+  text = text.replace(/\\#/g, '#')
+  text = text.replace(/\\-/g, '-')
+  text = text.replace(/\\>/g, '>').replace(/\\\|/g, '|')
+
   const questions = []
-  // 按 ### 【LeetCode 拆分题目块
-  const blocks = text.split(/\n###\s+/)
+  // 按题目标题拆分
+  const blocks = text.split(/\n#{2,3}\s+(?=【LeetCode)/)
   for (const block of blocks) {
-    const match = block.match(/^【LeetCode\s+(\d+)】(.+?)$/m)
-    if (!match) continue
-    const num = match[1]
-    const name = match[2].trim()
+    const m = block.match(/^【LeetCode\s+(\d+)】(.+?)$/m)
+    if (!m) continue
+    const num = m[1], name = m[2].trim()
 
-    // 提取题目描述
+    // 题目描述
     let desc = ''
-    const descMatch = block.match(/\*\*题目\*\*[：:](.+?)(?=\n\n|\n\*\*)/s)
-    if (descMatch) desc = descMatch[1].trim()
+    const dm = block.match(/\*\*题目\*\*[：:]\s*([\s\S]+?)(?=\n\n|\n\*\*核心)/m)
+    if (dm) desc = dm[1].trim().replace(/\*\*/g, '')
 
-    // 提取核心思路
+    // 核心思路
     let idea = ''
-    const ideaMatch = block.match(/\*\*核心思路\*\*[：:](.+?)(?=\n\n```|\n-\s+\*\*时间)/s)
-    if (ideaMatch) idea = ideaMatch[1].trim()
+    const im = block.match(/\*\*核心思路\*\*[：:]\s*([\s\S]+?)(?=\n\n*```|\n- +\*\*时间|\n---)/m)
+    if (im) idea = im[1].trim().replace(/\*\*/g, '')
 
-    // 提取复杂度
-    let complexity = ''
-    const cmpMatch = block.match(/\*\*时间复杂度\*\*[：:](.+?)$/m)
-    if (cmpMatch) complexity = cmpMatch[1].trim()
-    // 也尝试 "- **时间复杂度**" 格式
-    const cmpMatch2 = block.match(/-\s+\*\*时间复杂度\*\*[：:](.+?)(?:\s+\*\*空间|$)/m)
-    if (!complexity && cmpMatch2) complexity = cmpMatch2[1].trim()
+    // 复杂度
+    let cplx = ''
+    const cm = block.match(/\*\*时间复杂度\*\*[：:]\s*(.+?)$/m)
+    if (cm) cplx = cm[1].replace(/\*\*/g, '').trim()
 
-    // 提取代码块
+    // 代码
     let code = ''
-    const codeMatch = block.match(/```(?:cpp|c\+\+|java|python|javascript)?\n([\s\S]+?)```/)
-    if (codeMatch) code = codeMatch[1].trim()
+    const cd = block.match(/```(?:cpp|c\+\+|java|python|javascript)?\s*\n([\s\S]+?)```/)
+    if (cd) code = cd[1].trim()
 
-    // 构建闪卡
-    const front = `【LeetCode ${num}】${name}`
     let answer = ''
     if (desc) answer += desc + '\n\n'
     if (idea) answer += '💡 ' + idea
-    if (complexity) answer += '\n\n⏱ ' + complexity
+    if (cplx) answer += '\n\n⏱ ' + cplx
+    if (!answer) answer = name
 
-    questions.push({
-      q: front,
-      a: answer || '核心算法：' + name,
-      code: code
-    })
+    questions.push({ q: `【LeetCode ${num}】${name}`, a: answer, code: code })
   }
   return questions
 }
