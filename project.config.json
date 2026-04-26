@@ -1,3 +1,10 @@
 {
-  "appid": "wxce863e3914d1472d"
+  "setting": {
+    "condition": true
+  },
+  "simulatorPluginLibVersion": {
+    "wxext14566970e7e9f62": "2.27.3"
+  },
+  "projectArchitecture": "multiPlatform",
+  "compileType": "miniprogram"
 }

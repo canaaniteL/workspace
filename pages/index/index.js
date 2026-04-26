@@ -11,6 +11,11 @@ const DECKS = [
     id: 'algorithm', name: '算法学习', icon: '🧮',
     csvUrl: 'https://gist.githubusercontent.com/canaaniteL/85a5119037df5a08196c17e5557faffc/raw/gistfile1.txt',
     format: 'leetcode-md'
+  },
+  {
+    id: 'japanese', name: '日语学习', icon: '🇯🇵',
+    csvUrl: 'https://gist.githubusercontent.com/canaaniteL/3a8c50a90bb888a6c14b9a0e5a33a9d8/raw/Japanese50sound.csv',
+    format: 'csv'
   }
 ]
 
