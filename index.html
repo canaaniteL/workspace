@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>法语闪卡 - 刷题</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #F5F7FB; overflow: hidden; }
+
+.app {
+  height: 100%; max-width: 500px; margin: 0 auto;
+  display: flex; flex-direction: column; padding: 16px 20px env(safe-area-inset-bottom);
+}
+
+/* 顶部栏 */
+.top-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; min-height: 32px; flex-shrink: 0;
+}
+.top-left { display: flex; align-items: center; gap: 10px; }
+.mode-tag { font-size: 12px; color: #fff; background: #EF4444; padding: 2px 10px; border-radius: 12px; }
+.stat-brief { font-size: 12px; color: #999; }
+.top-right { display: flex; align-items: center; gap: 4px; }
+.top-btn { font-size: 13px; color: #5B7CFA; padding: 6px 12px; cursor: pointer; border: none; background: none; }
+.top-btn.menu-btn { font-size: 22px; color: #666; line-height: 1; }
+
+/* 卡片滑动区 */
+.swiper-area { flex: 1; position: relative; overflow: hidden; touch-action: pan-y; min-height: 0; }
+.cards-track {
+  display: flex; height: 100%; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.cards-track.swiping { transition: none; }
+.card-slide { flex: 0 0 100%; height: 100%; padding: 0 2px; }
+
+.card {
+  position: relative; width: 100%; height: 100%;
+  background: #2A2C31; border-radius: 20px;
+  box-shadow: 0 16px 40px -8px rgba(74, 222, 128, 0.25), 0 6px 20px rgba(0,0,0,0.08);
+  color: #fff; padding: 24px; display: flex; flex-direction: column;
+  overflow: hidden; cursor: pointer; user-select: none;
+}
+.card::after {
+  content: ''; position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(74,222,128,0.45) 0%, rgba(74,222,128,0) 70%);
+  pointer-events: none;
+}
+
+.card-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: rgba(255,255,255,0.55); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.rating-badge {
+  width: 22px; height: 22px; border-radius: 50%; color: #fff;
+  font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+
+.card-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 8px; }
+.q-text { font-size: 22px; line-height: 1.5; font-weight: 600; color: #fff; text-align: left; word-break: break-word; }
+.a-text { font-size: 20px; line-height: 1.55; color: #A7F3D0; text-align: center; word-break: break-word; }
+
+.card-footer { text-align: center; font-size: 13px; color: rgba(255,255,255,0.45); }
+.hint { padding: 8px 16px; cursor: pointer; }
+
+/* 评分面板 */
+.rating-panel {
+  background: #fff; border-radius: 16px; padding: 16px 20px; margin-top: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0;
+}
+.rating-title { font-size: 13px; color: #666; display: block; text-align: center; margin-bottom: 12px; }
+.rating-row { display: flex; justify-content: center; gap: 12px; }
+.rating-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ddd;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; cursor: pointer; transition: all 0.15s; font-size: 18px; font-weight: 700; color: #333;
+}
+.rating-btn:active { transform: scale(0.9); }
+.rating-btn.active { transform: scale(1.1); color: #fff; }
+.rating-labels { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 8px; font-size: 11px; color: #bbb; }
+
+/* 来源 */
+.source-bar { text-align: center; margin-top: 8px; flex-shrink: 0; }
+.source-tag { font-size: 11px; color: rgba(0,0,0,0.3); }
+
+/* 底部操作栏 */
+.toolbar {
+  margin-top: 12px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 4px; flex-shrink: 0;
+}
+.tool-btn {
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 1px solid #E5E7EF; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  cursor: pointer; transition: transform 0.1s;
+}
+.tool-btn:active { transform: scale(0.96); opacity: 0.85; }
+.circle { width: 44px; height: 44px; border-radius: 50%; }
+.arrow { font-size: 20px; color: #5B7CFA; }
+.pill { min-width: 70px; height: 40px; border-radius: 24px; padding: 0 14px; gap: 6px; }
+.pill .count { font-size: 14px; font-weight: 600; color: #333; }
+.icon-x { font-size: 16px; color: #EF4444; margin-right: 4px; font-weight: 700; }
+.icon-ok { font-size: 16px; color: #22C55E; margin-left: 4px; font-weight: 700; }
+.rate-btn { border-color: #EAB308; }
+.rate-icon { font-size: 16px; color: #EAB308; margin-right: 4px; }
+
+/* 弹层 */
+.overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 24px;
+}
+.overlay-card {
+  width: 100%; max-width: 420px; background: #fff; border-radius: 16px;
+  padding: 28px; box-shadow: 0 16px 48px rgba(0,0,0,0.15); position: relative;
+}
+.overlay-close { position: absolute; top: 12px; right: 16px; font-size: 20px; color: #bbb; cursor: pointer; padding: 6px; }
+
+/* 菜单 */
+.menu-list { display: flex; flex-direction: column; }
+.menu-item {
+  padding: 14px 0; font-size: 15px; color: #333; border-bottom: 1px solid #f0f0f0;
+  cursor: pointer; text-align: center;
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background: #f8f8f8; }
+.menu-item.danger { color: #EF4444; }
+
+/* 反馈表单 */
+.form-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+.form-tab {
+  flex: 1; text-align: center; padding: 10px 0; font-size: 14px; color: #999;
+  border: 1px solid #E5E7EF; border-radius: 10px; cursor: pointer;
+}
+.form-tab.active { color: #5B7CFA; border-color: #5B7CFA; background: rgba(91,124,250,0.06); font-weight: 600; }
+.field { margin-bottom: 16px; }
+.field label { font-size: 13px; color: #666; margin-bottom: 6px; display: block; }
+.field input, .field textarea {
+  width: 100%; border: 1px solid #E5E7EF; border-radius: 8px; padding: 10px 12px;
+  font-size: 14px; font-family: inherit; outline: none; resize: vertical;
+}
+.field textarea { min-height: 80px; }
+.field input:focus, .field textarea:focus { border-color: #5B7CFA; }
+.submit-btn {
+  width: 100%; text-align: center; background: #5B7CFA; color: #fff;
+  font-size: 15px; font-weight: 600; padding: 12px 0; border-radius: 10px;
+  border: none; cursor: pointer; margin-top: 8px;
+}
+.submit-btn:active { opacity: 0.8; }
+
+/* 反馈列表 */
+.feedback-list { max-height: 60vh; overflow-y: auto; }
+.fb-item { background: #f9f9fb; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+.fb-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.fb-type { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
+.fb-type.t-q { background: rgba(34,197,94,0.1); color: #22C55E; }
+.fb-type.t-f { background: rgba(91,124,250,0.1); color: #5B7CFA; }
+.fb-time { font-size: 11px; color: #bbb; flex: 1; }
+.fb-del { font-size: 11px; color: #EF4444; cursor: pointer; padding: 4px 8px; }
+.fb-row { font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 4px; }
+.fb-label { color: #999; font-weight: 600; margin-right: 6px; }
+.fb-answer { color: #22C55E; }
+.fb-empty { text-align: center; padding: 40px 0; color: #bbb; font-size: 14px; }
+
+/* 统计弹窗 */
+.stats-content { text-align: center; line-height: 2.2; font-size: 15px; color: #333; }
+.stats-content .num { font-weight: 700; color: #5B7CFA; }
+
+/* loading */
+.loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.loading span { color: #fff; font-size: 16px; }
+
+/* hidden */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <!-- Loading -->
+  <div class="loading" id="loading"><span>加载题库中...</span></div>
+
+  <!-- 顶部栏 -->
+  <div class="top-bar">
+    <div class="top-left">
+      <span class="mode-tag hidden" id="modeTag">复习模式</span>
+      <span class="stat-brief" id="statBrief">已评 0/0 · 平均 0</span>
+    </div>
+    <div class="top-right">
+      <button class="top-btn" onclick="showFeedback()">反馈</button>
+      <button class="top-btn menu-btn" onclick="showMenuPanel()">⋮</button>
+    </div>
+  </div>
+
+  <!-- 卡片区 -->
+  <div class="swiper-area" id="swiperArea">
+    <div class="cards-track" id="cardsTrack"></div>
+  </div>
+
+  <!-- 评分面板 -->
+  <div class="rating-panel hidden" id="ratingPanel">
+    <span class="rating-title">评价掌握程度</span>
+    <div class="rating-row" id="ratingRow"></div>
+    <div class="rating-labels"><span>完全不会</span><span>完全掌握</span></div>
+  </div>
+
+  <!-- 来源 -->
+  <div class="source-bar"><span class="source-tag" id="sourceTag">📦 内置</span></div>
+
+  <!-- 底部操作栏 -->
+  <div class="toolbar">
+    <div class="tool-btn circle" onclick="goPrev()"><span class="arrow">←</span></div>
+    <div class="tool-btn pill" onclick="markWrong()"><span class="icon-x">✕</span><span class="count" id="wrongCount">0</span></div>
+    <div class="tool-btn pill rate-btn" onclick="toggleRating()"><span class="rate-icon">★</span><span class="count">评分</span></div>
+    <div class="tool-btn pill" onclick="markRight()"><span class="count" id="rightCount">0</span><span class="icon-ok">✓</span></div>
+    <div class="tool-btn circle" onclick="goNext()"><span class="arrow">→</span></div>
+  </div>
+</div>
+
+<!-- 菜单弹层 -->
+<div class="overlay hidden" id="menuOverlay" onclick="closeMenu()">
+  <div class="overlay-card" onclick="event.stopPropagation()">
+    <div class="overlay-close" onclick="closeMenu()">✕</div>
+    <div class="menu-list" id="menuList"></div>
+  </div>
+</div>
+
+<!-- 反馈弹层 -->
+<div class="overlay hidden" id="feedbackOverlay">
+  <div class="overlay-card" onclick="event.stopPropagation()">
+    <div class="overlay-close" onclick="closeFeedback()">✕</div>
+    <div id="feedbackContent"></div>
+  </div>
+</div>
+
+<!-- 统计弹层 -->
+<div class="overlay hidden" id="statsOverlay" onclick="closeStats()">
+  <div class="overlay-card" onclick="event.stopPropagation()">
+    <div class="overlay-close" onclick="closeStats()">✕</div>
+    <div class="stats-content" id="statsContent"></div>
+  </div>
+</div>
+
+<script>
+// ==================== 配置 ====================
+const REMOTE_CSV_URL = 'https://gist.githubusercontent.com/canaaniteL/f35c54a90eddb22434ad275ab866b149/raw/flashcards.csv'
+const STORAGE_KEY = 'fc_state_v3'
+const RATINGS_KEY = 'fc_ratings_v1'
+const FEEDBACK_KEY = 'fc_feedbacks_v1'
+const QUESTIONS_CACHE = 'fc_questions_cache'
+
+// ==================== 内置题库 ====================
+const builtinQuestions = [
+  {q:'在法语发音中，位于词尾的字母 e 通常如何发音？',a:'通常不发音。'},
+  {q:'法语单词中的字母 h 是否发音？',a:'永远不发音。'},
+  {q:'法语字母组合 ou 的发音是什么？',a:'/u/（类似于汉语拼音的 u）。'},
+  {q:'法语字母组合 oi 的发音是什么？',a:'/wa/。'},
+  {q:'法语字母组合 ch 的发音是什么？',a:'/ʃ/（类似于英语的 sh）。'},
+  {q:'动词 parler 的 je 变位形式是什么？',a:'parle。'},
+  {q:'动词 aller 的 je 变位形式是什么？',a:'vais。'},
+  {q:'词汇翻译：le musée',a:'博物馆'},
+]
+
+// ==================== 状态 ====================
+let list = [], index = 0, total = 0, showAnswer = false
+let rightCount = 0, wrongCount = 0, source = 'builtin', mode = 'normal'
+let ratings = {}, allList = []
+let showRatingPanel = false
+
+// 滑动相关
+let startX = 0, startY = 0, dx = 0, isSwiping = false, isHorizontal = null
+
+// ==================== 初始化 ====================
+window.onload = () => {
+  if (REMOTE_CSV_URL) {
+    fetchCSV(REMOTE_CSV_URL)
+  } else {
+    const cached = load(QUESTIONS_CACHE)
+    applyQuestions(cached && cached.length ? cached : builtinQuestions, cached ? 'local' : 'builtin')
+  }
+  initSwipe()
+}
+
+function load(key) { try { return JSON.parse(localStorage.getItem(key)) } catch(e) { return null } }
+function save(key, val) { localStorage.setItem(key, JSON.stringify(val)) }
+
+// ==================== 题库 ====================
+function applyQuestions(q, src) {
+  allList = q
+  list = q; total = q.length; source = src
+  ratings = load(RATINGS_KEY) || {}
+  const saved = load(STORAGE_KEY) || {}
+  index = Math.min(saved.index || 0, total - 1)
+  rightCount = saved.rightCount || 0
+  wrongCount = saved.wrongCount || 0
+  showAnswer = false; mode = 'normal'
+  hide('loading')
+  render()
+}
+
+function fetchCSV(url) {
+  show('loading')
+  fetch(url).then(r => r.ok ? r.text() : Promise.reject()).then(text => {
+    const q = parseCSV(text)
+    if (q.length) { save(QUESTIONS_CACHE, q); applyQuestions(q, 'remote'); return }
+    fallback()
+  }).catch(() => fallback())
+}
+
+function fallback() {
+  const cached = load(QUESTIONS_CACHE)
+  applyQuestions(cached && cached.length ? cached : builtinQuestions, cached ? 'local' : 'builtin')
+}
+
+function parseCSV(text) {
+  if (!text) return []
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1)
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  const rows = []; let field = '', row = [], inQ = false
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (inQ) { if (c === '"') { if (text[i+1] === '"') { field += '"'; i++ } else inQ = false } else field += c }
+    else { if (c === '"') inQ = true; else if (c === ',') { row.push(field); field = '' }
+    else if (c === '\n') { row.push(field); field = ''; if (!(row.length===1&&row[0]==='')) rows.push(row); row = [] }
+    else field += c }
+  }
+  if (field || row.length) { row.push(field); if (!(row.length===1&&row[0]==='')) rows.push(row) }
+  if (rows.length < 2) return []
+  const h = rows[0].map(s => s.trim().toLowerCase())
+  let qi = h.indexOf('question'), ai = h.indexOf('answer')
+  if (qi === -1 || ai === -1) { qi = 0; ai = 1 }
+  return rows.slice(1).filter(r => r.length > Math.max(qi,ai) && (r[qi]||'').trim() && (r[ai]||'').trim())
+    .map(r => ({q: r[qi].trim(), a: r[ai].trim()}))
+}
+
+// ==================== 渲染 ====================
+function render() {
+  renderCards()
+  updateToolbar()
+  updateStats()
+  updateSource()
+  updateRatingPanel()
+  document.getElementById('modeTag').classList.toggle('hidden', mode !== 'review')
+}
+
+function renderCards() {
+  const track = document.getElementById('cardsTrack')
+  track.innerHTML = list.map((item, i) => {
+    const r = ratings[i]
+    const rColor = r ? (r <= 2 ? '#EF4444' : r <= 3 ? '#EAB308' : '#22C55E') : ''
+    const isActive = i === index
+    const content = isActive && showAnswer
+      ? `<span class="a-text">${esc(item.a)}</span>`
+      : `<span class="q-text">${esc(item.q)}</span>`
+    const hintText = isActive && showAnswer ? '收起答案' : '查看答案'
+    return `<div class="card-slide"><div class="card" onclick="toggleAnswer()">
+      <div class="card-header"><span>${i+1} / ${total}</span>
+        <div class="header-right">${r ? `<div class="rating-badge" style="background:${rColor}">${r}</div>` : ''}</div>
+      </div>
+      <div class="card-body">${content}</div>
+      <div class="card-footer"><span class="hint">${hintText}</span></div>
+    </div></div>`
+  }).join('')
+  track.style.transform = `translateX(-${index * 100}%)`
+  track.classList.remove('swiping')
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+function updateToolbar() {
+  document.getElementById('wrongCount').textContent = wrongCount
+  document.getElementById('rightCount').textContent = rightCount
+}
+
+function updateStats() {
+  const keys = Object.keys(ratings), n = keys.length
+  let sum = 0; keys.forEach(k => sum += ratings[k])
+  const avg = n ? (sum / n).toFixed(1) : 0
+  document.getElementById('statBrief').textContent = `已评 ${n}/${total} · 平均 ${avg}`
+}
+
+function updateSource() {
+  const m = { remote: '☁️ 云端', local: '📁 导入', builtin: '📦 内置' }
+  document.getElementById('sourceTag').textContent = m[source] || ''
+}
+
+function updateRatingPanel() {
+  const panel = document.getElementById('ratingPanel')
+  panel.classList.toggle('hidden', !showRatingPanel)
+  if (!showRatingPanel) return
+  const cur = ratings[index] || 0
+  const row = document.getElementById('ratingRow')
+  row.innerHTML = [1,2,3,4,5].map(s => {
+    const c = s <= 2 ? '#EF4444' : s <= 3 ? '#EAB308' : '#22C55E'
+    const active = cur === s
+    return `<div class="rating-btn ${active?'active':''}" style="border-color:${c};${active?`background:${c};color:#fff`:''}" onclick="rate(${s})">${s}</div>`
+  }).join('')
+}
+
+// ==================== 操作 ====================
+function toggleAnswer() { showAnswer = !showAnswer; render() }
+
+function goPrev() { if (index <= 0) return; index--; showAnswer = false; showRatingPanel = false; persist(); render() }
+function goNext() { if (index >= total - 1) return; index++; showAnswer = false; showRatingPanel = false; persist(); render() }
+
+function markWrong() { wrongCount++; persist(); if (index < total - 1) setTimeout(goNext, 160) ; else updateToolbar() }
+function markRight() { rightCount++; persist(); if (index < total - 1) setTimeout(goNext, 160); else updateToolbar() }
+
+function toggleRating() { showRatingPanel = !showRatingPanel; updateRatingPanel() }
+
+function rate(score) {
+  ratings[index] = score; save(RATINGS_KEY, ratings)
+  showRatingPanel = false
+  if (index < total - 1) setTimeout(goNext, 200); else render()
+}
+
+function persist() { save(STORAGE_KEY, { index, rightCount, wrongCount }) }
+
+// ==================== 滑动手势 ====================
+function initSwipe() {
+  const area = document.getElementById('swiperArea')
+  area.addEventListener('touchstart', onTouchStart, { passive: true })
+  area.addEventListener('touchmove', onTouchMove, { passive: false })
+  area.addEventListener('touchend', onTouchEnd)
+}
+
+function onTouchStart(e) {
+  const t = e.touches[0]; startX = t.clientX; startY = t.clientY; dx = 0; isSwiping = true; isHorizontal = null
+}
+function onTouchMove(e) {
+  if (!isSwiping) return
+  const t = e.touches[0]; dx = t.clientX - startX; const dy = t.clientY - startY
+  if (isHorizontal === null) { isHorizontal = Math.abs(dx) > Math.abs(dy) }
+  if (!isHorizontal) return
+  e.preventDefault()
+  const track = document.getElementById('cardsTrack')
+  const w = document.getElementById('swiperArea').offsetWidth
+  const offset = -index * w + dx
+  track.classList.add('swiping')
+  track.style.transform = `translateX(${offset}px)`
+}
+function onTouchEnd() {
+  if (!isSwiping) return; isSwiping = false
+  const w = document.getElementById('swiperArea').offsetWidth
+  const threshold = w * 0.15
+  if (dx < -threshold && index < total - 1) { index++; showAnswer = false; showRatingPanel = false; persist() }
+  else if (dx > threshold && index > 0) { index--; showAnswer = false; showRatingPanel = false; persist() }
+  render()
+}
+
+// ==================== 菜单 ====================
+function showMenuPanel() {
+  const items = [
+    { text: mode === 'review' ? '退出复习模式' : '复习薄弱题', action: toggleReview },
+    { text: '学习统计', action: showStatsPanel },
+    { text: '刷新云端题库', action: () => fetchCSV(REMOTE_CSV_URL) },
+    { text: '重置全部数据', action: resetAll, cls: 'danger' },
+  ]
+  document.getElementById('menuList').innerHTML = items.map(it =>
+    `<div class="menu-item ${it.cls||''}" onclick="this._action()">${it.text}</div>`
+  ).join('')
+  document.getElementById('menuList').querySelectorAll('.menu-item').forEach((el, i) => {
+    el._action = () => { closeMenu(); items[i].action() }
+  })
+  show('menuOverlay')
+}
+function closeMenu() { hide('menuOverlay') }
+
+function toggleReview() {
+  if (mode === 'review') {
+    list = allList; total = list.length; index = 0; showAnswer = false; mode = 'normal'
+  } else {
+    const review = allList.filter((_, i) => !ratings[i] || ratings[i] <= 2)
+    if (!review.length) { alert('没有需要复习的题目！'); return }
+    list = review; total = list.length; index = 0; showAnswer = false; mode = 'review'
+  }
+  render()
+}
+
+function resetAll() {
+  if (!confirm('将清空进度、评分和计数，确定吗？')) return
+  localStorage.removeItem(RATINGS_KEY); localStorage.removeItem(STORAGE_KEY)
+  ratings = {}; index = 0; rightCount = 0; wrongCount = 0; showAnswer = false
+  render()
+}
+
+// ==================== 统计 ====================
+function showStatsPanel() {
+  const keys = Object.keys(ratings), n = keys.length
+  let sum = 0, weak = 0, master = 0
+  keys.forEach(k => { sum += ratings[k]; if (ratings[k] <= 2) weak++; if (ratings[k] >= 4) master++ })
+  const avg = n ? (sum / n).toFixed(1) : 0
+  document.getElementById('statsContent').innerHTML = `
+    <h3 style="margin-bottom:16px">学习统计</h3>
+    总题数：<span class="num">${total}</span><br>
+    已评分：<span class="num">${n}</span> / ${total}<br>
+    平均掌握：<span class="num">${avg}</span> / 5<br>
+    薄弱题（≤2分）：<span class="num">${weak}</span> 题<br>
+    熟练题（≥4分）：<span class="num">${master}</span> 题<br>
+    完成率：<span class="num">${total ? Math.round(n/total*100) : 0}%</span>
+  `
+  show('statsOverlay')
+}
+function closeStats() { hide('statsOverlay') }
+
+// ==================== 反馈 ====================
+let fbMode = 'list' // 'list' | 'form'
+let fbFormType = 'feedback'
+
+function showFeedback() {
+  fbMode = 'list'; renderFeedback(); show('feedbackOverlay')
+}
+function closeFeedback() { hide('feedbackOverlay') }
+
+function renderFeedback() {
+  const el = document.getElementById('feedbackContent')
+  if (fbMode === 'list') {
+    const fbs = (load(FEEDBACK_KEY) || []).sort((a,b) => b.time - a.time)
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3>反馈与补充</h3>
+        <button class="top-btn" style="color:#5B7CFA;font-weight:600" onclick="fbMode='form';fbFormType='feedback';renderFeedback()">+ 新增</button>
+      </div>
+      ${fbs.length ? `<div class="feedback-list">${fbs.map(f => {
+        const time = new Date(f.time); const ts = `${time.getMonth()+1}/${time.getDate()} ${String(time.getHours()).padStart(2,'0')}:${String(time.getMinutes()).padStart(2,'0')}`
+        if (f.type === 'question') {
+          return `<div class="fb-item"><div class="fb-header"><span class="fb-type t-q">补充题目</span><span class="fb-time">${ts}</span><span class="fb-del" onclick="delFeedback(${f.id})">删除</span></div><div class="fb-row"><span class="fb-label">Q:</span>${esc(f.question)}</div><div class="fb-row"><span class="fb-label">A:</span><span class="fb-answer">${esc(f.answer)}</span></div></div>`
+        }
+        return `<div class="fb-item"><div class="fb-header"><span class="fb-type t-f">反馈</span><span class="fb-time">${ts}</span><span class="fb-del" onclick="delFeedback(${f.id})">删除</span></div>${f.relatedQ ? `<div class="fb-row"><span class="fb-label">关联:</span>${esc(f.relatedQ)}</div>` : ''}<div class="fb-row">${esc(f.content)}</div></div>`
+      }).join('')}</div>` : '<div class="fb-empty">暂无反馈记录</div>'}
+    `
+  } else {
+    const curQ = list[index] ? esc(list[index].q) : ''
+    el.innerHTML = `
+      <h3 style="margin-bottom:16px">新增</h3>
+      <div class="form-tabs">
+        <div class="form-tab ${fbFormType==='feedback'?'active':''}" onclick="fbFormType='feedback';renderFeedback()">反馈/批注</div>
+        <div class="form-tab ${fbFormType==='question'?'active':''}" onclick="fbFormType='question';renderFeedback()">补充题目</div>
+      </div>
+      ${fbFormType === 'feedback' ? `
+        <div class="field"><label>关联题目（可选）</label><input id="fbQ" value="${curQ}" /></div>
+        <div class="field"><label>反馈内容</label><textarea id="fbC" placeholder="题目有误？答案需要补充？"></textarea></div>
+      ` : `
+        <div class="field"><label>题目</label><textarea id="fbQ" placeholder="输入新的题目"></textarea></div>
+        <div class="field"><label>答案</label><textarea id="fbA" placeholder="输入对应答案"></textarea></div>
+      `}
+      <button class="submit-btn" onclick="submitFeedback()">提交</button>
+      <div style="text-align:center;margin-top:12px"><span class="top-btn" onclick="fbMode='list';renderFeedback()">← 返回列表</span></div>
+    `
+  }
+}
+
+function submitFeedback() {
+  const fbs = load(FEEDBACK_KEY) || []
+  const item = { id: Date.now(), type: fbFormType, time: Date.now() }
+  if (fbFormType === 'question') {
+    const q = document.getElementById('fbQ').value.trim()
+    const a = document.getElementById('fbA').value.trim()
+    if (!q || !a) { alert('题目和答案不能为空'); return }
+    item.question = q; item.answer = a
+  } else {
+    const c = document.getElementById('fbC').value.trim()
+    if (!c) { alert('请填写反馈内容'); return }
+    item.content = c; item.relatedQ = document.getElementById('fbQ').value.trim()
+  }
+  fbs.push(item); save(FEEDBACK_KEY, fbs)
+  fbMode = 'list'; renderFeedback()
+}
+
+function delFeedback(id) {
+  if (!confirm('确认删除？')) return
+  let fbs = load(FEEDBACK_KEY) || []
+  fbs = fbs.filter(f => f.id !== id); save(FEEDBACK_KEY, fbs)
+  renderFeedback()
+}
+
+// ==================== 工具 ====================
+function show(id) { document.getElementById(id).classList.remove('hidden') }
+function hide(id) { document.getElementById(id).classList.add('hidden') }
+</script>
+</body>
+</html>
