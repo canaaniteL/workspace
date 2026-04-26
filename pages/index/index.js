@@ -320,7 +320,7 @@ Page({
     wx.showToast({ title: '已打乱顺序', icon: 'none' })
   },
 
-  // 发音功能：有道词典 TTS，先下载再播放
+  // 发音功能：有道词典 TTS
   playTTS() {
     const item = this.data.list[this.data.index]
     if (!item || !this.data.ttsLang) return
@@ -350,27 +350,44 @@ Page({
     const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=${le}&type=2`
 
     wx.showLoading({ title: '加载发音...' })
-    wx.downloadFile({
+
+    // 用 request 获取 arraybuffer，写入临时文件播放（兼容重定向）
+    wx.request({
       url,
+      method: 'GET',
+      responseType: 'arraybuffer',
       success: (res) => {
         wx.hideLoading()
-        if (res.statusCode === 200 && res.tempFilePath) {
-          if (this._audioCtx) { this._audioCtx.stop(); this._audioCtx.destroy() }
-          const audio = wx.createInnerAudioContext()
-          this._audioCtx = audio
-          audio.src = res.tempFilePath
-          audio.play()
-          audio.onError((err) => {
-            console.error('Audio play error:', err)
-            wx.showToast({ title: '播放失败', icon: 'none' })
+        if (res.statusCode === 200 && res.data) {
+          const fs = wx.getFileSystemManager()
+          const tmpPath = `${wx.env.USER_DATA_PATH}/tts_${Date.now()}.mp3`
+          fs.writeFile({
+            filePath: tmpPath,
+            data: res.data,
+            encoding: 'binary',
+            success: () => {
+              if (this._audioCtx) { this._audioCtx.stop(); this._audioCtx.destroy() }
+              const audio = wx.createInnerAudioContext()
+              this._audioCtx = audio
+              audio.src = tmpPath
+              audio.play()
+              audio.onEnded(() => {
+                try { fs.unlinkSync(tmpPath) } catch(e) {}
+              })
+              audio.onError((err) => {
+                console.error('Audio play error:', err)
+                wx.showToast({ title: '播放失败', icon: 'none' })
+              })
+            },
+            fail: () => { wx.showToast({ title: '写入失败', icon: 'none' }) }
           })
         } else {
-          wx.showToast({ title: '发音下载失败', icon: 'none' })
+          wx.showToast({ title: '发音加载失败', icon: 'none' })
         }
       },
       fail: (err) => {
         wx.hideLoading()
-        console.error('Download TTS fail:', err)
+        console.error('TTS request fail:', err)
         wx.showToast({ title: '网络错误', icon: 'none' })
       }
     })
