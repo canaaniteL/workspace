@@ -1,39 +1,81 @@
 <view class="page">
-  <!-- 加载中 -->
   <view wx:if="{{loading}}" class="loading-mask">
     <text class="loading-text">加载题库中...</text>
   </view>
 
-  <!-- 卡片区 -->
-  <view
-    class="card"
-    style="transform: translateX({{translateX}}px);"
-    bindtouchstart="onTouchStart"
-    bindtouchmove="onTouchMove"
-    bindtouchend="onTouchEnd"
-    bindtap="toggleAnswer"
-  >
-    <view class="card-header">
-      <text class="progress">{{index + 1}} / {{total}}</text>
-      <view class="menu" catchtap="showMenu">⋮</view>
-    </view>
+  <!-- 顶部信息栏 -->
+  <view class="top-bar">
+    <text class="mode-tag" wx:if="{{mode === 'review'}}">复习模式</text>
+    <text class="stat-brief">已评 {{ratedCount}}/{{total}} · 平均 {{avgScore}}</text>
+  </view>
 
-    <view class="card-body">
-      <block wx:if="{{total === 0}}">
-        <text class="q-text">暂无题目\n点右上角 ⋮ 导入 CSV</text>
-      </block>
-      <block wx:elif="{{!showAnswer}}">
-        <text class="q-text">{{list[index].q}}</text>
-      </block>
-      <block wx:else>
-        <text class="a-text">{{list[index].a}}</text>
-      </block>
-    </view>
+  <!-- 卡片滑动区 -->
+  <view class="swiper-wrap">
+    <swiper
+      class="card-swiper"
+      current="{{index}}"
+      bindchange="onSwiperChange"
+      duration="250"
+      easing-function="easeOutCubic"
+    >
+      <swiper-item wx:for="{{list}}" wx:key="index">
+        <view class="card" bindtap="toggleAnswer">
+          <view class="card-header">
+            <text class="progress">{{index + 1}} / {{total}}</text>
+            <view class="header-right">
+              <view
+                wx:if="{{ratings[index]}}"
+                class="rating-badge"
+                style="background: {{ratings[index] <= 2 ? '#EF4444' : ratings[index] <= 3 ? '#EAB308' : '#22C55E'}};"
+              >{{ratings[index]}}</view>
+            </view>
+          </view>
 
-    <view class="card-footer">
-      <text class="hint" wx:if="{{total > 0}}">{{showAnswer ? '收起答案' : '查看答案'}}</text>
-      <text class="source-tag">{{source === 'remote' ? '☁️ 云端' : source === 'local' ? '📁 导入' : '📦 内置'}}</text>
+          <view class="card-body">
+            <block wx:if="{{currentIndex === index && showAnswer}}">
+              <text class="a-text">{{item.a}}</text>
+            </block>
+            <block wx:else>
+              <text class="q-text">{{item.q}}</text>
+            </block>
+          </view>
+
+          <view class="card-footer">
+            <text class="hint">{{currentIndex === index && showAnswer ? '收起答案' : '查看答案'}}</text>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <!-- cover-view 可以覆盖在 swiper 上方并正常响应点击 -->
+    <cover-view class="float-menu" bindtap="showMenu">⋮</cover-view>
+    <cover-view class="float-feedback" bindtap="goFeedback">反馈/补充</cover-view>
+  </view>
+
+  <!-- 评分面板 -->
+  <view class="rating-panel" wx:if="{{showRating}}">
+    <text class="rating-title">评价掌握程度</text>
+    <view class="rating-row">
+      <view
+        wx:for="{{[1,2,3,4,5]}}"
+        wx:key="*this"
+        class="rating-btn {{currentRating === item ? 'rating-active' : ''}}"
+        style="border-color: {{item <= 2 ? '#EF4444' : item <= 3 ? '#EAB308' : '#22C55E'}}; {{currentRating === item ? 'background:' + (item <= 2 ? '#EF4444' : item <= 3 ? '#EAB308' : '#22C55E') + ';color:#fff;' : ''}}"
+        catchtap="rateQuestion"
+        data-score="{{item}}"
+      >
+        <text class="rating-num">{{item}}</text>
+      </view>
     </view>
+    <view class="rating-labels">
+      <text class="rl-left">完全不会</text>
+      <text class="rl-right">完全掌握</text>
+    </view>
+  </view>
+
+  <!-- 来源标签 -->
+  <view class="source-bar">
+    <text class="source-tag">{{source === 'remote' ? '☁️ 云端' : source === 'local' ? '📁 导入' : '📦 内置'}}</text>
   </view>
 
   <!-- 底部操作栏 -->
@@ -45,6 +87,12 @@
     <view class="tool-btn pill wrong" catchtap="markWrong">
       <text class="icon-x">✕</text>
       <text class="count">{{wrongCount}}</text>
+    </view>
+
+    <!-- 评分按钮 -->
+    <view class="tool-btn pill rate-btn" catchtap="showRatingPanel">
+      <text class="rate-icon">★</text>
+      <text class="count">评分</text>
     </view>
 
     <view class="tool-btn pill right" catchtap="markRight">

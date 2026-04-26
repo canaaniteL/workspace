@@ -1,0 +1,84 @@
+<view class="page">
+  <!-- 顶部操作 -->
+  <view class="header">
+    <text class="title">反馈与题目补充</text>
+    <view class="add-btn" bindtap="showAddForm">+ 新增</view>
+  </view>
+
+  <!-- 新增表单 -->
+  <view class="form-mask" wx:if="{{showForm}}">
+    <view class="form-card">
+      <!-- 关闭按钮 -->
+      <view class="close-btn" bindtap="hideForm">✕</view>
+
+      <!-- 类型切换 -->
+      <view class="type-tabs">
+        <view class="tab {{formType === 'feedback' ? 'tab-active' : ''}}" bindtap="switchType" data-type="feedback">反馈/批注</view>
+        <view class="tab {{formType === 'question' ? 'tab-active' : ''}}" bindtap="switchType" data-type="question">补充题目</view>
+      </view>
+
+      <!-- 反馈表单 -->
+      <block wx:if="{{formType === 'feedback'}}">
+        <view class="field">
+          <text class="label">关联题目（可选）</text>
+          <input class="input" placeholder="当前题目或留空" value="{{inputQuestion}}" bindinput="onInputQuestion" />
+        </view>
+        <view class="field">
+          <text class="label">反馈内容</text>
+          <textarea class="textarea" placeholder="题目有误？答案需要补充？助记口诀？" value="{{inputContent}}" bindinput="onInputContent" maxlength="500" auto-height="{{true}}" />
+        </view>
+      </block>
+
+      <!-- 补充题目表单 -->
+      <block wx:if="{{formType === 'question'}}">
+        <view class="field">
+          <text class="label">题目（问题）</text>
+          <textarea class="textarea" placeholder="输入新的题目" value="{{inputQuestion}}" bindinput="onInputQuestion" maxlength="300" auto-height="{{true}}" />
+        </view>
+        <view class="field">
+          <text class="label">答案</text>
+          <textarea class="textarea" placeholder="输入对应答案" value="{{inputAnswer}}" bindinput="onInputAnswer" maxlength="300" auto-height="{{true}}" />
+        </view>
+      </block>
+
+      <view class="submit-btn" bindtap="submitFeedback">提交</view>
+    </view>
+  </view>
+
+  <!-- 反馈列表 -->
+  <view class="list" wx:if="{{feedbacks.length > 0}}">
+    <view class="item" wx:for="{{feedbacks}}" wx:key="id">
+      <view class="item-header">
+        <text class="item-type {{item.type === 'question' ? 'type-q' : 'type-f'}}">{{item.type === 'question' ? '补充题目' : '反馈'}}</text>
+        <text class="item-time">{{item.time}}</text>
+        <view class="item-del" catchtap="deleteFeedback" data-id="{{item.id}}">删除</view>
+      </view>
+
+      <block wx:if="{{item.type === 'question'}}">
+        <view class="item-row">
+          <text class="item-label">Q:</text>
+          <text class="item-text">{{item.question}}</text>
+        </view>
+        <view class="item-row">
+          <text class="item-label">A:</text>
+          <text class="item-text item-answer">{{item.answer}}</text>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="item-row" wx:if="{{item.relatedQ}}">
+          <text class="item-label">关联:</text>
+          <text class="item-text item-related">{{item.relatedQ}}</text>
+        </view>
+        <view class="item-row">
+          <text class="item-text">{{item.content}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:else>
+    <text class="empty-text">暂无反馈记录\n点击右上角「+ 新增」添加</text>
+  </view>
+</view>
