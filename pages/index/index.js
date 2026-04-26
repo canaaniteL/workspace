@@ -308,6 +308,18 @@ Page({
     this.setData({ showAnswer: 2 })
   },
 
+  // 打乱题目顺序（Fisher-Yates 洗牌）
+  shuffleList() {
+    const list = [...this.data.list]
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]]
+    }
+    this.setData({ list, index: 0, currentIndex: 0, showAnswer: 0 })
+    this.persist()
+    wx.showToast({ title: '已打乱顺序', icon: 'none' })
+  },
+
   // 发音功能：使用 Google TTS（免费、支持多语言）
   playTTS() {
     const item = this.data.list[this.data.index]

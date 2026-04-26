@@ -64,6 +64,7 @@
       </swiper-item>
     </swiper>
 
+    <cover-view class="float-shuffle" bindtap="shuffleList">🔀</cover-view>
     <cover-view class="float-menu" bindtap="showMenu">⋮</cover-view>
     <cover-view class="float-feedback" bindtap="goFeedback">反馈</cover-view>
     <cover-view class="float-tts" bindtap="playTTS" wx:if="{{hasTTS}}">🔊</cover-view>
