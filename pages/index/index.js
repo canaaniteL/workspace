@@ -1,4 +1,5 @@
 const builtinFrench = require('../../data/questions.js')
+const plugin = requirePlugin('WechatSI')
 
 // 题库分类配置
 const DECKS = [
@@ -320,7 +321,7 @@ Page({
     wx.showToast({ title: '已打乱顺序', icon: 'none' })
   },
 
-  // 发音功能：使用有道词典 TTS（国内可用）
+  // 发音功能：使用微信同声传译插件 TTS
   playTTS() {
     const item = this.data.list[this.data.index]
     if (!item || !this.data.ttsLang) return
@@ -347,23 +348,26 @@ Page({
 
     if (!text) { wx.showToast({ title: '无法识别发音内容', icon: 'none' }); return }
 
-    // 有道词典 TTS 接口（国内稳定可用）
-    // le=jap 日语, le=fr 法语, le=eng 英语
-    const leMap = { ja: 'jap', fr: 'fr', en: 'eng' }
-    const le = leMap[lang] || 'eng'
-    const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=${le}&type=2`
+    // 同声传译插件的语言代码：zh_CN / en_US / ja_JP / fr_FR
+    const langMap = { ja: 'ja_JP', fr: 'fr_FR', en: 'en_US' }
+    const ttsLang = langMap[lang] || 'en_US'
 
-    if (this._audioCtx) {
-      this._audioCtx.stop()
-      this._audioCtx.destroy()
-    }
-    const audio = wx.createInnerAudioContext()
-    this._audioCtx = audio
-    audio.src = url
-    audio.play()
-    audio.onError((err) => {
-      console.error('TTS error:', err)
-      wx.showToast({ title: '发音失败', icon: 'none' })
+    plugin.textToSpeech({
+      lang: ttsLang,
+      content: text,
+      success: (res) => {
+        if (res.filename) {
+          if (this._audioCtx) { this._audioCtx.stop(); this._audioCtx.destroy() }
+          const audio = wx.createInnerAudioContext()
+          this._audioCtx = audio
+          audio.src = res.filename
+          audio.play()
+        }
+      },
+      fail: (err) => {
+        console.error('TTS fail:', err)
+        wx.showToast({ title: '发音失败', icon: 'none' })
+      }
     })
   },
 
