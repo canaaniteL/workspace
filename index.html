@@ -5,67 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>法语闪卡 - 刷题</title>
+<title>闪卡刷题</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #F5F7FB; overflow: hidden; }
 
-.app {
-  height: 100%; max-width: 500px; margin: 0 auto;
-  display: flex; flex-direction: column; padding: 16px 20px env(safe-area-inset-bottom);
-}
+.app { height: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; padding: 16px 20px env(safe-area-inset-bottom); }
 
 /* 顶部栏 */
-.top-bar {
-  display: flex; align-items: center; margin-bottom: 12px; min-height: 32px; flex-shrink: 0;
-}
-.top-left { display: flex; align-items: center; gap: 10px; }
-.mode-tag { font-size: 12px; color: #fff; background: #EF4444; padding: 2px 10px; border-radius: 12px; }
+.top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; min-height: 36px; flex-shrink: 0; }
+.top-left { display: flex; align-items: center; gap: 8px; }
+.mode-tag { font-size: 12px; color: #fff; background: #EF4444; padding: 2px 10px; border-radius: 12px; display: none; }
+.mode-tag.show { display: inline; }
 .stat-brief { font-size: 12px; color: #999; }
+.deck-selector {
+  display: flex; align-items: center; gap: 6px; padding: 6px 14px; background: #fff;
+  border: 1px solid #E5E7EF; border-radius: 20px; cursor: pointer; font-size: 13px; color: #333;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.deck-selector:active { background: #f8f8fa; }
+.deck-arrow { font-size: 10px; color: #999; }
 
-/* 卡片滑动区 */
+/* 卡片区 */
 .swiper-area { flex: 1; position: relative; overflow: hidden; touch-action: pan-y; min-height: 0; }
-
-/* 浮动在卡片上的按钮 */
-.float-menu {
-  position: absolute; top: 16px; right: 20px; z-index: 10;
-  font-size: 24px; color: rgba(255,255,255,0.7); cursor: pointer;
-  width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-}
+.float-menu { position: absolute; top: 16px; right: 20px; z-index: 10; font-size: 24px; color: rgba(255,255,255,0.7); cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
 .float-menu:active { opacity: 0.6; }
-.float-feedback {
-  position: absolute; bottom: 16px; right: 20px; z-index: 10;
-  font-size: 12px; color: rgba(255,255,255,0.4); text-decoration: underline;
-  cursor: pointer; padding: 8px 12px;
-}
+.float-feedback { position: absolute; bottom: 16px; right: 20px; z-index: 10; font-size: 12px; color: rgba(255,255,255,0.4); text-decoration: underline; cursor: pointer; padding: 8px 12px; }
 .float-feedback:active { opacity: 0.6; }
-.cards-track {
-  display: flex; height: 100%; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
+
+.cards-track { display: flex; height: 100%; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
 .cards-track.swiping { transition: none; }
 .card-slide { flex: 0 0 100%; height: 100%; padding: 0 2px; }
 
 .card {
-  position: relative; width: 100%; height: 100%;
-  background: #2A2C31; border-radius: 20px;
+  position: relative; width: 100%; height: 100%; background: #2A2C31; border-radius: 20px;
   box-shadow: 0 16px 40px -8px rgba(74, 222, 128, 0.25), 0 6px 20px rgba(0,0,0,0.08);
-  color: #fff; padding: 24px; display: flex; flex-direction: column;
-  overflow: hidden; cursor: pointer; user-select: none;
+  color: #fff; padding: 24px; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; user-select: none;
 }
-.card::after {
-  content: ''; position: absolute; right: -80px; top: 50%; transform: translateY(-50%);
-  width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(74,222,128,0.45) 0%, rgba(74,222,128,0) 70%);
-  pointer-events: none;
-}
+.card::after { content: ''; position: absolute; right: -80px; top: 50%; transform: translateY(-50%); width: 200px; height: 200px; background: radial-gradient(circle, rgba(74,222,128,0.45) 0%, rgba(74,222,128,0) 70%); pointer-events: none; }
 
 .card-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: rgba(255,255,255,0.55); }
 .header-right { display: flex; align-items: center; gap: 8px; }
-.rating-badge {
-  width: 22px; height: 22px; border-radius: 50%; color: #fff;
-  font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center;
-}
+.rating-badge { width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
 .card-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 8px; }
 .q-text { font-size: 22px; line-height: 1.5; font-weight: 600; color: #fff; text-align: left; word-break: break-word; }
@@ -75,17 +56,10 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
 .hint { padding: 8px 16px; cursor: pointer; }
 
 /* 评分面板 */
-.rating-panel {
-  background: #fff; border-radius: 16px; padding: 16px 20px; margin-top: 10px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0;
-}
+.rating-panel { background: #fff; border-radius: 16px; padding: 16px 20px; margin-top: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0; }
 .rating-title { font-size: 13px; color: #666; display: block; text-align: center; margin-bottom: 12px; }
 .rating-row { display: flex; justify-content: center; gap: 12px; }
-.rating-btn {
-  width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ddd;
-  display: flex; align-items: center; justify-content: center;
-  background: #fff; cursor: pointer; transition: all 0.15s; font-size: 18px; font-weight: 700; color: #333;
-}
+.rating-btn { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; background: #fff; cursor: pointer; transition: all 0.15s; font-size: 18px; font-weight: 700; color: #333; }
 .rating-btn:active { transform: scale(0.9); }
 .rating-btn.active { transform: scale(1.1); color: #fff; }
 .rating-labels { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 8px; font-size: 11px; color: #bbb; }
@@ -95,15 +69,8 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
 .source-tag { font-size: 11px; color: rgba(0,0,0,0.3); }
 
 /* 底部操作栏 */
-.toolbar {
-  margin-top: 12px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 4px; flex-shrink: 0;
-}
-.tool-btn {
-  display: flex; align-items: center; justify-content: center;
-  background: #fff; border: 1px solid #E5E7EF; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  cursor: pointer; transition: transform 0.1s;
-}
+.toolbar { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; flex-shrink: 0; }
+.tool-btn { display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #E5E7EF; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; transition: transform 0.1s; }
 .tool-btn:active { transform: scale(0.96); opacity: 0.85; }
 .circle { width: 44px; height: 44px; border-radius: 50%; }
 .arrow { font-size: 20px; color: #5B7CFA; }
@@ -115,51 +82,41 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
 .rate-icon { font-size: 16px; color: #EAB308; margin-right: 4px; }
 
 /* 弹层 */
-.overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
-  z-index: 100; padding: 24px;
-}
-.overlay-card {
-  width: 100%; max-width: 420px; background: #fff; border-radius: 16px;
-  padding: 28px; box-shadow: 0 16px 48px rgba(0,0,0,0.15); position: relative;
-}
+.overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+.overlay-card { width: 100%; max-width: 420px; background: #fff; border-radius: 16px; padding: 28px; box-shadow: 0 16px 48px rgba(0,0,0,0.15); position: relative; max-height: 80vh; overflow-y: auto; }
 .overlay-close { position: absolute; top: 12px; right: 16px; font-size: 20px; color: #bbb; cursor: pointer; padding: 6px; }
 
 /* 菜单 */
 .menu-list { display: flex; flex-direction: column; }
-.menu-item {
-  padding: 14px 0; font-size: 15px; color: #333; border-bottom: 1px solid #f0f0f0;
-  cursor: pointer; text-align: center;
-}
+.menu-item { padding: 14px 0; font-size: 15px; color: #333; border-bottom: 1px solid #f0f0f0; cursor: pointer; text-align: center; }
 .menu-item:last-child { border-bottom: none; }
 .menu-item:active { background: #f8f8f8; }
 .menu-item.danger { color: #EF4444; }
 
-/* 反馈表单 */
+/* 分类选择 */
+.deck-list { display: flex; flex-direction: column; gap: 12px; }
+.deck-item { display: flex; align-items: center; padding: 16px; background: #f9f9fb; border-radius: 14px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
+.deck-item:active { transform: scale(0.98); }
+.deck-item.current { border-color: #5B7CFA; background: rgba(91,124,250,0.06); }
+.deck-icon { font-size: 28px; margin-right: 14px; }
+.deck-info { flex: 1; }
+.deck-name { font-size: 15px; font-weight: 600; color: #333; }
+.deck-desc { font-size: 12px; color: #999; margin-top: 4px; }
+.deck-badge { font-size: 12px; color: #5B7CFA; font-weight: 600; }
+
+/* 反馈 */
 .form-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-.form-tab {
-  flex: 1; text-align: center; padding: 10px 0; font-size: 14px; color: #999;
-  border: 1px solid #E5E7EF; border-radius: 10px; cursor: pointer;
-}
+.form-tab { flex: 1; text-align: center; padding: 10px 0; font-size: 14px; color: #999; border: 1px solid #E5E7EF; border-radius: 10px; cursor: pointer; }
 .form-tab.active { color: #5B7CFA; border-color: #5B7CFA; background: rgba(91,124,250,0.06); font-weight: 600; }
 .field { margin-bottom: 16px; }
 .field label { font-size: 13px; color: #666; margin-bottom: 6px; display: block; }
-.field input, .field textarea {
-  width: 100%; border: 1px solid #E5E7EF; border-radius: 8px; padding: 10px 12px;
-  font-size: 14px; font-family: inherit; outline: none; resize: vertical;
-}
+.field input, .field textarea { width: 100%; border: 1px solid #E5E7EF; border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: inherit; outline: none; resize: vertical; }
 .field textarea { min-height: 80px; }
 .field input:focus, .field textarea:focus { border-color: #5B7CFA; }
-.submit-btn {
-  width: 100%; text-align: center; background: #5B7CFA; color: #fff;
-  font-size: 15px; font-weight: 600; padding: 12px 0; border-radius: 10px;
-  border: none; cursor: pointer; margin-top: 8px;
-}
+.submit-btn { width: 100%; text-align: center; background: #5B7CFA; color: #fff; font-size: 15px; font-weight: 600; padding: 12px 0; border-radius: 10px; border: none; cursor: pointer; margin-top: 8px; }
 .submit-btn:active { opacity: 0.8; }
-
-/* 反馈列表 */
-.feedback-list { max-height: 60vh; overflow-y: auto; }
+.top-btn { font-size: 13px; color: #5B7CFA; padding: 6px 12px; cursor: pointer; border: none; background: none; }
+.feedback-list { max-height: 50vh; overflow-y: auto; }
 .fb-item { background: #f9f9fb; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
 .fb-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .fb-type { font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
@@ -172,28 +129,28 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
 .fb-answer { color: #22C55E; }
 .fb-empty { text-align: center; padding: 40px 0; color: #bbb; font-size: 14px; }
 
-/* 统计弹窗 */
 .stats-content { text-align: center; line-height: 2.2; font-size: 15px; color: #333; }
 .stats-content .num { font-weight: 700; color: #5B7CFA; }
 
-/* loading */
 .loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 999; }
 .loading span { color: #fff; font-size: 16px; }
 
-/* hidden */
 .hidden { display: none !important; }
 </style>
 </head>
 <body>
-<div class="app" id="app">
-  <!-- Loading -->
-  <div class="loading" id="loading"><span>加载题库中...</span></div>
+<div class="app">
+  <div class="loading hidden" id="loading"><span>加载题库中...</span></div>
 
   <!-- 顶部栏 -->
   <div class="top-bar">
     <div class="top-left">
-      <span class="mode-tag hidden" id="modeTag">复习模式</span>
-      <span class="stat-brief" id="statBrief">已评 0/0 · 平均 0</span>
+      <span class="mode-tag" id="modeTag">复习模式</span>
+      <span class="stat-brief" id="statBrief"></span>
+    </div>
+    <div class="deck-selector" onclick="showDeckPicker()">
+      <span id="deckLabel">选择题库</span>
+      <span class="deck-arrow">▼</span>
     </div>
   </div>
 
@@ -211,8 +168,7 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
     <div class="rating-labels"><span>完全不会</span><span>完全掌握</span></div>
   </div>
 
-  <!-- 来源 -->
-  <div class="source-bar"><span class="source-tag" id="sourceTag">📦 内置</span></div>
+  <div class="source-bar"><span class="source-tag" id="sourceTag"></span></div>
 
   <!-- 底部操作栏 -->
   <div class="toolbar">
@@ -224,99 +180,130 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Ping
   </div>
 </div>
 
-<!-- 菜单弹层 -->
-<div class="overlay hidden" id="menuOverlay" onclick="closeMenu()">
-  <div class="overlay-card" onclick="event.stopPropagation()">
-    <div class="overlay-close" onclick="closeMenu()">✕</div>
-    <div class="menu-list" id="menuList"></div>
-  </div>
-</div>
-
-<!-- 反馈弹层 -->
-<div class="overlay hidden" id="feedbackOverlay">
-  <div class="overlay-card" onclick="event.stopPropagation()">
-    <div class="overlay-close" onclick="closeFeedback()">✕</div>
-    <div id="feedbackContent"></div>
-  </div>
-</div>
-
-<!-- 统计弹层 -->
-<div class="overlay hidden" id="statsOverlay" onclick="closeStats()">
-  <div class="overlay-card" onclick="event.stopPropagation()">
-    <div class="overlay-close" onclick="closeStats()">✕</div>
-    <div class="stats-content" id="statsContent"></div>
-  </div>
-</div>
+<!-- 弹层们 -->
+<div class="overlay hidden" id="deckOverlay" onclick="closeDeckPicker()"><div class="overlay-card" onclick="event.stopPropagation()"><div class="overlay-close" onclick="closeDeckPicker()">✕</div><h3 style="margin-bottom:16px">选择题库</h3><div class="deck-list" id="deckList"></div></div></div>
+<div class="overlay hidden" id="menuOverlay" onclick="closeMenu()"><div class="overlay-card" onclick="event.stopPropagation()"><div class="overlay-close" onclick="closeMenu()">✕</div><div class="menu-list" id="menuList"></div></div></div>
+<div class="overlay hidden" id="feedbackOverlay"><div class="overlay-card" onclick="event.stopPropagation()"><div class="overlay-close" onclick="closeFeedback()">✕</div><div id="feedbackContent"></div></div></div>
+<div class="overlay hidden" id="statsOverlay" onclick="closeStats()"><div class="overlay-card" onclick="event.stopPropagation()"><div class="overlay-close" onclick="closeStats()">✕</div><div class="stats-content" id="statsContent"></div></div></div>
 
 <script>
-// ==================== 配置 ====================
-const REMOTE_CSV_URL = 'https://gist.githubusercontent.com/canaaniteL/f35c54a90eddb22434ad275ab866b149/raw/flashcards.csv'
-const STORAGE_KEY = 'fc_state_v3'
-const RATINGS_KEY = 'fc_ratings_v1'
-const FEEDBACK_KEY = 'fc_feedbacks_v1'
-const QUESTIONS_CACHE = 'fc_questions_cache'
-
-// ==================== 内置题库 ====================
-const builtinQuestions = [
-  {q:'在法语发音中，位于词尾的字母 e 通常如何发音？',a:'通常不发音。'},
-  {q:'法语单词中的字母 h 是否发音？',a:'永远不发音。'},
-  {q:'法语字母组合 ou 的发音是什么？',a:'/u/（类似于汉语拼音的 u）。'},
-  {q:'法语字母组合 oi 的发音是什么？',a:'/wa/。'},
-  {q:'法语字母组合 ch 的发音是什么？',a:'/ʃ/（类似于英语的 sh）。'},
-  {q:'动词 parler 的 je 变位形式是什么？',a:'parle。'},
-  {q:'动词 aller 的 je 变位形式是什么？',a:'vais。'},
-  {q:'词汇翻译：le musée',a:'博物馆'},
+// ==================== 题库分类配置 ====================
+const DECKS = [
+  {
+    id: 'french',
+    name: '法语学习',
+    icon: '🇫🇷',
+    desc: '发音、动词变位、词汇、语法',
+    csvUrl: 'https://gist.githubusercontent.com/canaaniteL/f35c54a90eddb22434ad275ab866b149/raw/flashcards.csv',
+    builtin: [
+      {q:'法语字母组合 ou 的发音是什么？',a:'/u/（类似于汉语拼音的 u）。'},
+      {q:'法语字母组合 oi 的发音是什么？',a:'/wa/。'},
+      {q:'动词 parler 的 je 变位形式是什么？',a:'parle。'},
+      {q:'词汇翻译：le musée',a:'博物馆'},
+    ]
+  },
+  {
+    id: 'algorithm',
+    name: '算法学习',
+    icon: '🧮',
+    desc: '数据结构、排序、搜索、动态规划',
+    csvUrl: '', // 后续可加 Gist 链接
+    builtin: [
+      {q:'什么是时间复杂度？',a:'描述算法执行时间随输入规模增长的变化趋势，用大O表示法。'},
+      {q:'数组和链表的主要区别是什么？',a:'数组连续存储、随机访问O(1)、插入O(n)；链表非连续、访问O(n)、插入O(1)。'},
+      {q:'快速排序的平均时间复杂度是？',a:'O(n log n)，最坏情况O(n²)。'},
+      {q:'什么是哈希表？',a:'通过哈希函数将键映射到数组索引的数据结构，平均查找/插入/删除为O(1)。'},
+      {q:'二分查找的前提条件是什么？',a:'数据必须是有序的。时间复杂度O(log n)。'},
+      {q:'什么是动态规划（DP）？',a:'将问题分解为重叠子问题，通过记忆化或自底向上的方式避免重复计算。'},
+      {q:'BFS 和 DFS 分别用什么数据结构实现？',a:'BFS 用队列（Queue），DFS 用栈（Stack）或递归。'},
+      {q:'什么是稳定排序？举例。',a:'相等元素的相对顺序不变。例：归并排序、冒泡排序、插入排序。'},
+      {q:'栈（Stack）的特点是什么？',a:'后进先出（LIFO），只能在栈顶进行 push 和 pop 操作。'},
+      {q:'二叉搜索树（BST）的性质是什么？',a:'左子树所有节点值 < 根节点值 < 右子树所有节点值。中序遍历得到有序序列。'},
+      {q:'什么是贪心算法？',a:'每一步都选择当前最优解，不回溯。适用于局部最优能导出全局最优的问题。'},
+      {q:'堆（Heap）的特点是什么？',a:'完全二叉树，最大堆中父节点≥子节点，最小堆反之。插入/删除O(log n)，取极值O(1)。'},
+      {q:'归并排序的核心思想是什么？',a:'分治法：将数组一分为二，递归排序后合并。时间O(n log n)，空间O(n)。'},
+      {q:'什么是回溯算法？',a:'通过尝试所有可能的选择，发现不满足条件时撤销选择（回溯），继续尝试其他路径。'},
+      {q:'图的邻接表和邻接矩阵各自的优缺点？',a:'邻接表：省空间O(V+E)，遍历邻居快；邻接矩阵：查边O(1)，但空间O(V²)。'},
+    ]
+  }
 ]
 
 // ==================== 状态 ====================
-let list = [], index = 0, total = 0, showAnswer = false
+let currentDeckId = ''
+let list = [], allList = [], index = 0, total = 0, showAnswer = false
 let rightCount = 0, wrongCount = 0, source = 'builtin', mode = 'normal'
-let ratings = {}, allList = []
-let showRatingPanel = false
-
-// 滑动相关
+let ratings = {}, showRatingPanelFlag = false
 let startX = 0, startY = 0, dx = 0, isSwiping = false, isHorizontal = null
+
+function storageKey(base) { return `fc_${currentDeckId}_${base}` }
 
 // ==================== 初始化 ====================
 window.onload = () => {
-  if (REMOTE_CSV_URL) {
-    fetchCSV(REMOTE_CSV_URL)
-  } else {
-    const cached = load(QUESTIONS_CACHE)
-    applyQuestions(cached && cached.length ? cached : builtinQuestions, cached ? 'local' : 'builtin')
-  }
+  currentDeckId = localStorage.getItem('fc_current_deck') || DECKS[0].id
+  loadDeck(currentDeckId)
   initSwipe()
 }
 
 function load(key) { try { return JSON.parse(localStorage.getItem(key)) } catch(e) { return null } }
 function save(key, val) { localStorage.setItem(key, JSON.stringify(val)) }
 
-// ==================== 题库 ====================
-function applyQuestions(q, src) {
-  allList = q
-  list = q; total = q.length; source = src
-  ratings = load(RATINGS_KEY) || {}
-  const saved = load(STORAGE_KEY) || {}
-  index = Math.min(saved.index || 0, total - 1)
-  rightCount = saved.rightCount || 0
-  wrongCount = saved.wrongCount || 0
-  showAnswer = false; mode = 'normal'
-  hide('loading')
-  render()
+// ==================== 题库分类 ====================
+function loadDeck(deckId) {
+  const deck = DECKS.find(d => d.id === deckId)
+  if (!deck) return
+  currentDeckId = deckId
+  localStorage.setItem('fc_current_deck', deckId)
+  document.getElementById('deckLabel').textContent = deck.icon + ' ' + deck.name
+  document.title = deck.name + ' - 闪卡刷题'
+
+  if (deck.csvUrl) {
+    fetchCSV(deck.csvUrl, deck.builtin)
+  } else {
+    const cached = load(storageKey('cache'))
+    applyQuestions(cached && cached.length ? cached : deck.builtin, cached ? 'local' : 'builtin')
+  }
 }
 
-function fetchCSV(url) {
+function showDeckPicker() {
+  const el = document.getElementById('deckList')
+  el.innerHTML = DECKS.map(d => `
+    <div class="deck-item ${d.id === currentDeckId ? 'current' : ''}" onclick="selectDeck('${d.id}')">
+      <span class="deck-icon">${d.icon}</span>
+      <div class="deck-info">
+        <div class="deck-name">${d.name}</div>
+        <div class="deck-desc">${d.desc}</div>
+      </div>
+      ${d.id === currentDeckId ? '<span class="deck-badge">当前</span>' : ''}
+    </div>
+  `).join('')
+  show('deckOverlay')
+}
+function closeDeckPicker() { hide('deckOverlay') }
+function selectDeck(id) { closeDeckPicker(); loadDeck(id) }
+
+// ==================== 题库加载 ====================
+function applyQuestions(q, src) {
+  allList = q; list = q; total = q.length; source = src
+  ratings = load(storageKey('ratings')) || {}
+  const saved = load(storageKey('state')) || {}
+  index = Math.min(saved.index || 0, Math.max(total - 1, 0))
+  rightCount = saved.rightCount || 0; wrongCount = saved.wrongCount || 0
+  showAnswer = false; mode = 'normal'; showRatingPanelFlag = false
+  hide('loading'); render()
+}
+
+function fetchCSV(url, fallbackBuiltin) {
   show('loading')
   fetch(url).then(r => r.ok ? r.text() : Promise.reject()).then(text => {
     const q = parseCSV(text)
-    if (q.length) { save(QUESTIONS_CACHE, q); applyQuestions(q, 'remote'); return }
-    fallback()
-  }).catch(() => fallback())
+    if (q.length) { save(storageKey('cache'), q); applyQuestions(q, 'remote'); return }
+    doFallback(fallbackBuiltin)
+  }).catch(() => doFallback(fallbackBuiltin))
 }
 
-function fallback() {
-  const cached = load(QUESTIONS_CACHE)
-  applyQuestions(cached && cached.length ? cached : builtinQuestions, cached ? 'local' : 'builtin')
+function doFallback(fallbackBuiltin) {
+  const cached = load(storageKey('cache'))
+  applyQuestions(cached && cached.length ? cached : (fallbackBuiltin || []), cached ? 'local' : 'builtin')
 }
 
 function parseCSV(text) {
@@ -326,264 +313,147 @@ function parseCSV(text) {
   const rows = []; let field = '', row = [], inQ = false
   for (let i = 0; i < text.length; i++) {
     const c = text[i]
-    if (inQ) { if (c === '"') { if (text[i+1] === '"') { field += '"'; i++ } else inQ = false } else field += c }
-    else { if (c === '"') inQ = true; else if (c === ',') { row.push(field); field = '' }
-    else if (c === '\n') { row.push(field); field = ''; if (!(row.length===1&&row[0]==='')) rows.push(row); row = [] }
-    else field += c }
+    if (inQ) { if (c === '"') { if (text[i+1]==='"'){field+='"';i++} else inQ=false } else field+=c }
+    else { if (c==='"') inQ=true; else if (c===','){row.push(field);field=''} else if (c==='\n'){row.push(field);field='';if(!(row.length===1&&row[0]===''))rows.push(row);row=[]} else field+=c }
   }
-  if (field || row.length) { row.push(field); if (!(row.length===1&&row[0]==='')) rows.push(row) }
-  if (rows.length < 2) return []
-  const h = rows[0].map(s => s.trim().toLowerCase())
-  let qi = h.indexOf('question'), ai = h.indexOf('answer')
-  if (qi === -1 || ai === -1) { qi = 0; ai = 1 }
-  return rows.slice(1).filter(r => r.length > Math.max(qi,ai) && (r[qi]||'').trim() && (r[ai]||'').trim())
-    .map(r => ({q: r[qi].trim(), a: r[ai].trim()}))
+  if (field||row.length){row.push(field);if(!(row.length===1&&row[0]===''))rows.push(row)}
+  if (rows.length<2) return []
+  const h=rows[0].map(s=>s.trim().toLowerCase()); let qi=h.indexOf('question'),ai=h.indexOf('answer')
+  if(qi===-1||ai===-1){qi=0;ai=1}
+  return rows.slice(1).filter(r=>r.length>Math.max(qi,ai)&&(r[qi]||'').trim()&&(r[ai]||'').trim()).map(r=>({q:r[qi].trim(),a:r[ai].trim()}))
 }
 
 // ==================== 渲染 ====================
 function render() {
-  renderCards()
-  updateToolbar()
-  updateStats()
-  updateSource()
-  updateRatingPanel()
-  document.getElementById('modeTag').classList.toggle('hidden', mode !== 'review')
+  renderCards(); updateToolbar(); updateStats(); updateSource(); updateRatingPanel()
+  document.getElementById('modeTag').classList.toggle('show', mode === 'review')
 }
 
 function renderCards() {
   const track = document.getElementById('cardsTrack')
+  if (!list.length) { track.innerHTML = '<div class="card-slide"><div class="card"><div class="card-body"><span class="q-text">暂无题目</span></div></div></div>'; return }
   track.innerHTML = list.map((item, i) => {
-    const r = ratings[i]
-    const rColor = r ? (r <= 2 ? '#EF4444' : r <= 3 ? '#EAB308' : '#22C55E') : ''
+    const r = ratings[i], rColor = r ? (r<=2?'#EF4444':r<=3?'#EAB308':'#22C55E') : ''
     const isActive = i === index
-    const content = isActive && showAnswer
-      ? `<span class="a-text">${esc(item.a)}</span>`
-      : `<span class="q-text">${esc(item.q)}</span>`
-    const hintText = isActive && showAnswer ? '收起答案' : '查看答案'
+    const content = isActive && showAnswer ? `<span class="a-text">${esc(item.a)}</span>` : `<span class="q-text">${esc(item.q)}</span>`
     return `<div class="card-slide"><div class="card" onclick="toggleAnswer()">
-      <div class="card-header"><span>${i+1} / ${total}</span>
-        <div class="header-right">${r ? `<div class="rating-badge" style="background:${rColor}">${r}</div>` : ''}</div>
-      </div>
+      <div class="card-header"><span>${i+1} / ${total}</span><div class="header-right">${r?`<div class="rating-badge" style="background:${rColor}">${r}</div>`:''}</div></div>
       <div class="card-body">${content}</div>
-      <div class="card-footer"><span class="hint">${hintText}</span></div>
+      <div class="card-footer"><span class="hint">${isActive&&showAnswer?'收起答案':'查看答案'}</span></div>
     </div></div>`
   }).join('')
-  track.style.transform = `translateX(-${index * 100}%)`
-  track.classList.remove('swiping')
+  track.style.transform = `translateX(-${index * 100}%)`; track.classList.remove('swiping')
 }
 
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-
-function updateToolbar() {
-  document.getElementById('wrongCount').textContent = wrongCount
-  document.getElementById('rightCount').textContent = rightCount
-}
-
+function updateToolbar() { document.getElementById('wrongCount').textContent = wrongCount; document.getElementById('rightCount').textContent = rightCount }
 function updateStats() {
-  const keys = Object.keys(ratings), n = keys.length
-  let sum = 0; keys.forEach(k => sum += ratings[k])
-  const avg = n ? (sum / n).toFixed(1) : 0
-  document.getElementById('statBrief').textContent = `已评 ${n}/${total} · 平均 ${avg}`
+  const keys = Object.keys(ratings), n = keys.length; let sum = 0; keys.forEach(k => sum += ratings[k])
+  document.getElementById('statBrief').textContent = `已评 ${n}/${total} · 平均 ${n?(sum/n).toFixed(1):0}`
 }
-
 function updateSource() {
-  const m = { remote: '☁️ 云端', local: '📁 导入', builtin: '📦 内置' }
-  document.getElementById('sourceTag').textContent = m[source] || ''
+  const deck = DECKS.find(d => d.id === currentDeckId)
+  const m = { remote:'☁️ 云端', local:'📁 缓存', builtin:'📦 内置' }
+  document.getElementById('sourceTag').textContent = (deck ? deck.icon+' '+deck.name : '') + ' · ' + (m[source]||'')
 }
-
 function updateRatingPanel() {
-  const panel = document.getElementById('ratingPanel')
-  panel.classList.toggle('hidden', !showRatingPanel)
-  if (!showRatingPanel) return
+  const panel = document.getElementById('ratingPanel'); panel.classList.toggle('hidden', !showRatingPanelFlag)
+  if (!showRatingPanelFlag) return
   const cur = ratings[index] || 0
-  const row = document.getElementById('ratingRow')
-  row.innerHTML = [1,2,3,4,5].map(s => {
-    const c = s <= 2 ? '#EF4444' : s <= 3 ? '#EAB308' : '#22C55E'
-    const active = cur === s
+  document.getElementById('ratingRow').innerHTML = [1,2,3,4,5].map(s => {
+    const c = s<=2?'#EF4444':s<=3?'#EAB308':'#22C55E'; const active = cur===s
     return `<div class="rating-btn ${active?'active':''}" style="border-color:${c};${active?`background:${c};color:#fff`:''}" onclick="rate(${s})">${s}</div>`
   }).join('')
 }
 
 // ==================== 操作 ====================
 function toggleAnswer() { showAnswer = !showAnswer; render() }
+function goPrev() { if(index<=0)return; index--; showAnswer=false; showRatingPanelFlag=false; persist(); render() }
+function goNext() { if(index>=total-1)return; index++; showAnswer=false; showRatingPanelFlag=false; persist(); render() }
+function markWrong() { wrongCount++; persist(); if(index<total-1) setTimeout(goNext,160); else updateToolbar() }
+function markRight() { rightCount++; persist(); if(index<total-1) setTimeout(goNext,160); else updateToolbar() }
+function toggleRating() { showRatingPanelFlag = !showRatingPanelFlag; updateRatingPanel() }
+function rate(score) { ratings[index]=score; save(storageKey('ratings'),ratings); showRatingPanelFlag=false; if(index<total-1) setTimeout(goNext,200); else render() }
+function persist() { save(storageKey('state'), {index, rightCount, wrongCount}) }
 
-function goPrev() { if (index <= 0) return; index--; showAnswer = false; showRatingPanel = false; persist(); render() }
-function goNext() { if (index >= total - 1) return; index++; showAnswer = false; showRatingPanel = false; persist(); render() }
-
-function markWrong() { wrongCount++; persist(); if (index < total - 1) setTimeout(goNext, 160) ; else updateToolbar() }
-function markRight() { rightCount++; persist(); if (index < total - 1) setTimeout(goNext, 160); else updateToolbar() }
-
-function toggleRating() { showRatingPanel = !showRatingPanel; updateRatingPanel() }
-
-function rate(score) {
-  ratings[index] = score; save(RATINGS_KEY, ratings)
-  showRatingPanel = false
-  if (index < total - 1) setTimeout(goNext, 200); else render()
-}
-
-function persist() { save(STORAGE_KEY, { index, rightCount, wrongCount }) }
-
-// ==================== 滑动手势 ====================
+// ==================== 滑动 ====================
 function initSwipe() {
-  const area = document.getElementById('swiperArea')
-  area.addEventListener('touchstart', onTouchStart, { passive: true })
-  area.addEventListener('touchmove', onTouchMove, { passive: false })
-  area.addEventListener('touchend', onTouchEnd)
-}
-
-function onTouchStart(e) {
-  const t = e.touches[0]; startX = t.clientX; startY = t.clientY; dx = 0; isSwiping = true; isHorizontal = null
-}
-function onTouchMove(e) {
-  if (!isSwiping) return
-  const t = e.touches[0]; dx = t.clientX - startX; const dy = t.clientY - startY
-  if (isHorizontal === null) { isHorizontal = Math.abs(dx) > Math.abs(dy) }
-  if (!isHorizontal) return
-  e.preventDefault()
-  const track = document.getElementById('cardsTrack')
-  const w = document.getElementById('swiperArea').offsetWidth
-  const offset = -index * w + dx
-  track.classList.add('swiping')
-  track.style.transform = `translateX(${offset}px)`
-}
-function onTouchEnd() {
-  if (!isSwiping) return; isSwiping = false
-  const w = document.getElementById('swiperArea').offsetWidth
-  const threshold = w * 0.15
-  if (dx < -threshold && index < total - 1) { index++; showAnswer = false; showRatingPanel = false; persist() }
-  else if (dx > threshold && index > 0) { index--; showAnswer = false; showRatingPanel = false; persist() }
-  render()
+  const a = document.getElementById('swiperArea')
+  a.addEventListener('touchstart', e=>{const t=e.touches[0];startX=t.clientX;startY=t.clientY;dx=0;isSwiping=true;isHorizontal=null}, {passive:true})
+  a.addEventListener('touchmove', e=>{
+    if(!isSwiping)return; const t=e.touches[0];dx=t.clientX-startX;const dy=t.clientY-startY
+    if(isHorizontal===null) isHorizontal=Math.abs(dx)>Math.abs(dy); if(!isHorizontal)return; e.preventDefault()
+    const track=document.getElementById('cardsTrack'),w=document.getElementById('swiperArea').offsetWidth
+    track.classList.add('swiping'); track.style.transform=`translateX(${-index*w+dx}px)`
+  }, {passive:false})
+  a.addEventListener('touchend', ()=>{
+    if(!isSwiping)return; isSwiping=false
+    const w=document.getElementById('swiperArea').offsetWidth, th=w*0.15
+    if(dx<-th&&index<total-1){index++;showAnswer=false;showRatingPanelFlag=false;persist()}
+    else if(dx>th&&index>0){index--;showAnswer=false;showRatingPanelFlag=false;persist()}
+    render()
+  })
 }
 
 // ==================== 菜单 ====================
 function showMenuPanel() {
   const items = [
-    { text: mode === 'review' ? '退出复习模式' : '复习薄弱题', action: toggleReview },
-    { text: '学习统计', action: showStatsPanel },
-    { text: '刷新云端题库', action: () => fetchCSV(REMOTE_CSV_URL) },
-    { text: '重置全部数据', action: resetAll, cls: 'danger' },
+    {text: mode==='review'?'退出复习模式':'复习薄弱题', action: toggleReview},
+    {text: '学习统计', action: showStatsPanel},
+    {text: '刷新题库', action: ()=>{ const d=DECKS.find(d=>d.id===currentDeckId); if(d&&d.csvUrl) fetchCSV(d.csvUrl,d.builtin); else alert('当前题库无云端数据源') }},
+    {text: '重置当前题库进度', action: resetAll, cls:'danger'},
   ]
-  document.getElementById('menuList').innerHTML = items.map(it =>
-    `<div class="menu-item ${it.cls||''}" onclick="this._action()">${it.text}</div>`
-  ).join('')
-  document.getElementById('menuList').querySelectorAll('.menu-item').forEach((el, i) => {
-    el._action = () => { closeMenu(); items[i].action() }
-  })
+  const el = document.getElementById('menuList')
+  el.innerHTML = items.map(it=>`<div class="menu-item ${it.cls||''}">${it.text}</div>`).join('')
+  el.querySelectorAll('.menu-item').forEach((e,i)=>{ e.onclick=()=>{closeMenu();items[i].action()} })
   show('menuOverlay')
 }
 function closeMenu() { hide('menuOverlay') }
 
 function toggleReview() {
-  if (mode === 'review') {
-    list = allList; total = list.length; index = 0; showAnswer = false; mode = 'normal'
-  } else {
-    const review = allList.filter((_, i) => !ratings[i] || ratings[i] <= 2)
-    if (!review.length) { alert('没有需要复习的题目！'); return }
-    list = review; total = list.length; index = 0; showAnswer = false; mode = 'review'
-  }
+  if (mode==='review') { list=allList; total=list.length; index=0; showAnswer=false; mode='normal' }
+  else { const r=allList.filter((_,i)=>!ratings[i]||ratings[i]<=2); if(!r.length){alert('没有需要复习的题目！');return}; list=r;total=r.length;index=0;showAnswer=false;mode='review' }
   render()
 }
-
 function resetAll() {
-  if (!confirm('将清空进度、评分和计数，确定吗？')) return
-  localStorage.removeItem(RATINGS_KEY); localStorage.removeItem(STORAGE_KEY)
-  ratings = {}; index = 0; rightCount = 0; wrongCount = 0; showAnswer = false
-  render()
+  if(!confirm('将清空当前题库的进度、评分和计数，确定吗？'))return
+  localStorage.removeItem(storageKey('ratings')); localStorage.removeItem(storageKey('state'))
+  ratings={}; index=0; rightCount=0; wrongCount=0; showAnswer=false; render()
 }
 
 // ==================== 统计 ====================
 function showStatsPanel() {
-  const keys = Object.keys(ratings), n = keys.length
-  let sum = 0, weak = 0, master = 0
-  keys.forEach(k => { sum += ratings[k]; if (ratings[k] <= 2) weak++; if (ratings[k] >= 4) master++ })
-  const avg = n ? (sum / n).toFixed(1) : 0
-  document.getElementById('statsContent').innerHTML = `
-    <h3 style="margin-bottom:16px">学习统计</h3>
-    总题数：<span class="num">${total}</span><br>
-    已评分：<span class="num">${n}</span> / ${total}<br>
-    平均掌握：<span class="num">${avg}</span> / 5<br>
-    薄弱题（≤2分）：<span class="num">${weak}</span> 题<br>
-    熟练题（≥4分）：<span class="num">${master}</span> 题<br>
-    完成率：<span class="num">${total ? Math.round(n/total*100) : 0}%</span>
-  `
+  const keys=Object.keys(ratings),n=keys.length; let sum=0,weak=0,master=0
+  keys.forEach(k=>{sum+=ratings[k];if(ratings[k]<=2)weak++;if(ratings[k]>=4)master++})
+  document.getElementById('statsContent').innerHTML=`<h3 style="margin-bottom:16px">学习统计</h3>总题数：<span class="num">${total}</span><br>已评分：<span class="num">${n}</span> / ${total}<br>平均掌握：<span class="num">${n?(sum/n).toFixed(1):0}</span> / 5<br>薄弱题（≤2分）：<span class="num">${weak}</span> 题<br>熟练题（≥4分）：<span class="num">${master}</span> 题<br>完成率：<span class="num">${total?Math.round(n/total*100):0}%</span>`
   show('statsOverlay')
 }
 function closeStats() { hide('statsOverlay') }
 
 // ==================== 反馈 ====================
-let fbMode = 'list' // 'list' | 'form'
-let fbFormType = 'feedback'
-
-function showFeedback() {
-  fbMode = 'list'; renderFeedback(); show('feedbackOverlay')
-}
+let fbMode='list', fbFormType='feedback'
+function showFeedback() { fbMode='list'; renderFeedback(); show('feedbackOverlay') }
 function closeFeedback() { hide('feedbackOverlay') }
-
 function renderFeedback() {
-  const el = document.getElementById('feedbackContent')
-  if (fbMode === 'list') {
-    const fbs = (load(FEEDBACK_KEY) || []).sort((a,b) => b.time - a.time)
-    el.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <h3>反馈与补充</h3>
-        <button class="top-btn" style="color:#5B7CFA;font-weight:600" onclick="fbMode='form';fbFormType='feedback';renderFeedback()">+ 新增</button>
-      </div>
-      ${fbs.length ? `<div class="feedback-list">${fbs.map(f => {
-        const time = new Date(f.time); const ts = `${time.getMonth()+1}/${time.getDate()} ${String(time.getHours()).padStart(2,'0')}:${String(time.getMinutes()).padStart(2,'0')}`
-        if (f.type === 'question') {
-          return `<div class="fb-item"><div class="fb-header"><span class="fb-type t-q">补充题目</span><span class="fb-time">${ts}</span><span class="fb-del" onclick="delFeedback(${f.id})">删除</span></div><div class="fb-row"><span class="fb-label">Q:</span>${esc(f.question)}</div><div class="fb-row"><span class="fb-label">A:</span><span class="fb-answer">${esc(f.answer)}</span></div></div>`
-        }
-        return `<div class="fb-item"><div class="fb-header"><span class="fb-type t-f">反馈</span><span class="fb-time">${ts}</span><span class="fb-del" onclick="delFeedback(${f.id})">删除</span></div>${f.relatedQ ? `<div class="fb-row"><span class="fb-label">关联:</span>${esc(f.relatedQ)}</div>` : ''}<div class="fb-row">${esc(f.content)}</div></div>`
-      }).join('')}</div>` : '<div class="fb-empty">暂无反馈记录</div>'}
-    `
+  const el=document.getElementById('feedbackContent'), fk=storageKey('feedbacks')
+  if (fbMode==='list') {
+    const fbs=(load(fk)||[]).sort((a,b)=>b.time-a.time)
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3>反馈与补充</h3><button class="top-btn" style="color:#5B7CFA;font-weight:600" onclick="fbMode='form';fbFormType='feedback';renderFeedback()">+ 新增</button></div>${fbs.length?`<div class="feedback-list">${fbs.map(f=>{const t=new Date(f.time),ts=`${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;return f.type==='question'?`<div class="fb-item"><div class="fb-header"><span class="fb-type t-q">补充题目</span><span class="fb-time">${ts}</span><span class="fb-del" onclick="delFb(${f.id})">删除</span></div><div class="fb-row"><span class="fb-label">Q:</span>${esc(f.question)}</div><div class="fb-row"><span class="fb-label">A:</span><span class="fb-answer">${esc(f.answer)}</span></div></div>`:`<div class="fb-item"><div class="fb-header"><span class="fb-type t-f">反馈</span><span class="fb-time">${ts}</span><span class="fb-del" onclick="delFb(${f.id})">删除</span></div>${f.relatedQ?`<div class="fb-row"><span class="fb-label">关联:</span>${esc(f.relatedQ)}</div>`:''}<div class="fb-row">${esc(f.content)}</div></div>`}).join('')}</div>`:'<div class="fb-empty">暂无反馈记录</div>'}`
   } else {
-    const curQ = list[index] ? esc(list[index].q) : ''
-    el.innerHTML = `
-      <h3 style="margin-bottom:16px">新增</h3>
-      <div class="form-tabs">
-        <div class="form-tab ${fbFormType==='feedback'?'active':''}" onclick="fbFormType='feedback';renderFeedback()">反馈/批注</div>
-        <div class="form-tab ${fbFormType==='question'?'active':''}" onclick="fbFormType='question';renderFeedback()">补充题目</div>
-      </div>
-      ${fbFormType === 'feedback' ? `
-        <div class="field"><label>关联题目（可选）</label><input id="fbQ" value="${curQ}" /></div>
-        <div class="field"><label>反馈内容</label><textarea id="fbC" placeholder="题目有误？答案需要补充？"></textarea></div>
-      ` : `
-        <div class="field"><label>题目</label><textarea id="fbQ" placeholder="输入新的题目"></textarea></div>
-        <div class="field"><label>答案</label><textarea id="fbA" placeholder="输入对应答案"></textarea></div>
-      `}
-      <button class="submit-btn" onclick="submitFeedback()">提交</button>
-      <div style="text-align:center;margin-top:12px"><span class="top-btn" onclick="fbMode='list';renderFeedback()">← 返回列表</span></div>
-    `
+    const curQ=list[index]?esc(list[index].q):''
+    el.innerHTML=`<h3 style="margin-bottom:16px">新增</h3><div class="form-tabs"><div class="form-tab ${fbFormType==='feedback'?'active':''}" onclick="fbFormType='feedback';renderFeedback()">反馈/批注</div><div class="form-tab ${fbFormType==='question'?'active':''}" onclick="fbFormType='question';renderFeedback()">补充题目</div></div>${fbFormType==='feedback'?`<div class="field"><label>关联题目（可选）</label><input id="fbQ" value="${curQ}"/></div><div class="field"><label>反馈内容</label><textarea id="fbC" placeholder="题目有误？答案需要补充？"></textarea></div>`:`<div class="field"><label>题目</label><textarea id="fbQ" placeholder="输入新的题目"></textarea></div><div class="field"><label>答案</label><textarea id="fbA" placeholder="输入对应答案"></textarea></div>`}<button class="submit-btn" onclick="submitFb()">提交</button><div style="text-align:center;margin-top:12px"><span class="top-btn" onclick="fbMode='list';renderFeedback()">← 返回列表</span></div>`
   }
 }
-
-function submitFeedback() {
-  const fbs = load(FEEDBACK_KEY) || []
-  const item = { id: Date.now(), type: fbFormType, time: Date.now() }
-  if (fbFormType === 'question') {
-    const q = document.getElementById('fbQ').value.trim()
-    const a = document.getElementById('fbA').value.trim()
-    if (!q || !a) { alert('题目和答案不能为空'); return }
-    item.question = q; item.answer = a
-  } else {
-    const c = document.getElementById('fbC').value.trim()
-    if (!c) { alert('请填写反馈内容'); return }
-    item.content = c; item.relatedQ = document.getElementById('fbQ').value.trim()
-  }
-  fbs.push(item); save(FEEDBACK_KEY, fbs)
-  fbMode = 'list'; renderFeedback()
+function submitFb() {
+  const fk=storageKey('feedbacks'), fbs=load(fk)||[], item={id:Date.now(),type:fbFormType,time:Date.now()}
+  if(fbFormType==='question'){const q=document.getElementById('fbQ').value.trim(),a=document.getElementById('fbA').value.trim();if(!q||!a){alert('题目和答案不能为空');return};item.question=q;item.answer=a}
+  else{const c=document.getElementById('fbC').value.trim();if(!c){alert('请填写反馈内容');return};item.content=c;item.relatedQ=document.getElementById('fbQ').value.trim()}
+  fbs.push(item);save(fk,fbs);fbMode='list';renderFeedback()
 }
+function delFb(id){if(!confirm('确认删除？'))return;const fk=storageKey('feedbacks');let fbs=load(fk)||[];fbs=fbs.filter(f=>f.id!==id);save(fk,fbs);renderFeedback()}
 
-function delFeedback(id) {
-  if (!confirm('确认删除？')) return
-  let fbs = load(FEEDBACK_KEY) || []
-  fbs = fbs.filter(f => f.id !== id); save(FEEDBACK_KEY, fbs)
-  renderFeedback()
-}
-
-// ==================== 工具 ====================
-function show(id) { document.getElementById(id).classList.remove('hidden') }
-function hide(id) { document.getElementById(id).classList.add('hidden') }
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
 </script>
 </body>
 </html>
