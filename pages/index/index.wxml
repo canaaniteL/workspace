@@ -7,7 +7,7 @@
   <view class="top-bar">
     <view class="top-left">
       <text class="mode-tag" wx:if="{{mode === 'review'}}">复习模式</text>
-      <text class="stat-brief">已评 {{ratedCount}}/{{total}} · 平均 {{avgScore}}</text>
+      <text class="stat-brief">✓ {{ratedCount}}/{{total}}</text>
     </view>
     <view class="deck-selector" bindtap="showDeckPicker">
       <text>{{currentDeckName}}</text>
@@ -15,83 +15,137 @@
     </view>
   </view>
 
-  <!-- 卡片滑动区 -->
-  <view class="swiper-wrap">
-    <swiper
-      class="card-swiper"
-      current="{{index}}"
-      bindchange="onSwiperChange"
-      duration="200"
-      easing-function="easeOutCubic"
-      displayMultipleItems="1"
-      skip-hidden-item-layout="{{false}}"
-    >
-      <swiper-item wx:for="{{list}}" wx:key="index">
-        <view class="card" bindtap="toggleAnswer">
-          <view class="card-header">
-            <text class="progress">{{index + 1}} / {{total}}</text>
-            <view class="header-right">
-              <view
-                wx:if="{{ratings[index]}}"
-                class="rating-badge"
-                style="background: {{ratings[index] <= 2 ? '#EF4444' : ratings[index] <= 3 ? '#EAB308' : '#22C55E'}};"
-              >{{ratings[index]}}</view>
-            </view>
-          </view>
-
-          <view class="card-body">
-            <!-- 代码视图 -->
-            <block wx:if="{{currentIndex === index && showAnswer === 2 && item.code}}">
-              <scroll-view scroll-y class="code-scroll">
-                <text class="code-text">{{item.code}}</text>
-              </scroll-view>
-            </block>
-            <!-- 答案/思路视图 -->
-            <block wx:elif="{{currentIndex === index && showAnswer === 1}}">
-              <text class="a-text">{{item.a}}</text>
-            </block>
-            <!-- 题面视图 -->
-            <block wx:else>
-              <text class="q-text">{{item.q}}</text>
-            </block>
-          </view>
-
-          <view class="card-footer">
-            <text class="hint" wx:if="{{currentIndex === index && showAnswer === 2}}">返回题面</text>
-            <text class="hint" wx:elif="{{currentIndex === index && showAnswer === 1}}">返回题面</text>
-            <text class="hint" wx:else>查看答案</text>
-            <text class="code-link" wx:if="{{currentIndex === index && showAnswer === 1 && item.code}}" catchtap="showCode">📝 查看代码</text>
+  <!-- ==================== 选择题模式 ==================== -->
+  <block wx:if="{{isQuizMode}}">
+    <view class="quiz-wrap">
+      <!-- 题目卡片 -->
+      <view class="quiz-card">
+        <view class="card-header">
+          <text class="progress">{{index + 1}} / {{total}}</text>
+          <view class="header-right">
+            <view wx:if="{{ratings[index] === 'right'}}" class="rating-badge rating-right">✓</view>
+            <view wx:elif="{{ratings[index] === 'wrong'}}" class="rating-badge rating-wrong">✕</view>
+            <view wx:else class="rating-badge rating-none">-</view>
           </view>
         </view>
-      </swiper-item>
-    </swiper>
 
-    <cover-view class="float-shuffle" bindtap="shuffleList">🔀</cover-view>
-    <cover-view class="float-menu" bindtap="showMenu">⋮</cover-view>
-    <cover-view class="float-feedback" bindtap="goFeedback">反馈</cover-view>
-    <cover-view class="float-tts" bindtap="playTTS" wx:if="{{hasTTS}}">🔊</cover-view>
-  </view>
-
-  <!-- 评分面板 -->
-  <view class="rating-panel" wx:if="{{showRating}}">
-    <text class="rating-title">评价掌握程度</text>
-    <view class="rating-row">
-      <view
-        wx:for="{{[1,2,3,4,5]}}"
-        wx:key="*this"
-        class="rating-btn {{currentRating === item ? 'rating-active' : ''}}"
-        style="border-color: {{item <= 2 ? '#EF4444' : item <= 3 ? '#EAB308' : '#22C55E'}}; {{currentRating === item ? 'background:' + (item <= 2 ? '#EF4444' : item <= 3 ? '#EAB308' : '#22C55E') + ';color:#fff;' : ''}}"
-        catchtap="rateQuestion"
-        data-score="{{item}}"
-      >
-        <text class="rating-num">{{item}}</text>
+        <scroll-view scroll-y class="quiz-question-scroll">
+          <text class="quiz-question">{{list[index].q}}</text>
+        </scroll-view>
       </view>
+
+      <!-- 选项列表 -->
+      <scroll-view scroll-y class="quiz-options-scroll">
+        <view class="quiz-options">
+          <view
+            wx:for="{{list[index].options}}"
+            wx:key="index"
+            wx:for-index="optIdx"
+            class="quiz-option {{quizAnswered && optIdx === list[currentIndex].answer ? 'option-correct' : ''}} {{quizAnswered && selectedOption === optIdx && optIdx !== list[currentIndex].answer ? 'option-wrong' : ''}} {{!quizAnswered && selectedOption === optIdx ? 'option-selected' : ''}}"
+            catchtap="selectOption"
+            data-idx="{{optIdx}}"
+          >
+            <text class="option-label">{{optIdx === 0 ? 'A' : optIdx === 1 ? 'B' : optIdx === 2 ? 'C' : 'D'}}</text>
+            <text class="option-text">{{item}}</text>
+            <text wx:if="{{quizAnswered && optIdx === list[currentIndex].answer}}" class="option-icon">✓</text>
+            <text wx:if="{{quizAnswered && selectedOption === optIdx && optIdx !== list[currentIndex].answer}}" class="option-icon option-icon-wrong">✕</text>
+          </view>
+        </view>
+
+        <!-- 解析 -->
+        <view wx:if="{{quizAnswered}}" class="quiz-result">
+          <view class="result-tag {{quizCorrect ? 'result-correct' : 'result-wrong'}}">
+            {{quizCorrect ? '回答正确！' : '回答错误'}}
+          </view>
+          <view class="hint-toggle" catchtap="toggleHint">
+            <text>{{showHint ? '收起解析 ▲' : '查看解析 ▼'}}</text>
+          </view>
+          <view wx:if="{{showHint && list[index].hint}}" class="hint-content">
+            <text>{{list[index].hint}}</text>
+          </view>
+        </view>
+      </scroll-view>
     </view>
-    <view class="rating-labels">
-      <text class="rl-left">完全不会</text>
-      <text class="rl-right">完全掌握</text>
+
+    <!-- 浮动按钮 -->
+    <view class="quiz-float-bar">
+      <view class="float-btn-item" bindtap="shuffleList">🔀</view>
+      <view class="float-btn-item" bindtap="showMenu">⋮</view>
     </view>
-  </view>
+  </block>
+
+  <!-- ==================== 闪卡模式（原有） ==================== -->
+  <block wx:else>
+    <!-- 算法分类标签栏 -->
+    <scroll-view wx:if="{{currentDeckId === 'algorithm' && algoCategories.length > 0}}" scroll-x class="algo-cat-bar" enable-flex>
+      <view class="cat-tag {{currentAlgoCategory === '' ? 'cat-tag-active' : ''}}" bindtap="onCatTagTap" data-cat="">全部</view>
+      <view wx:for="{{algoCategories}}" wx:key="*this"
+        class="cat-tag {{currentAlgoCategory === item ? 'cat-tag-active' : ''}}"
+        bindtap="onCatTagTap" data-cat="{{item}}">{{item}}</view>
+    </scroll-view>
+
+    <view class="swiper-wrap">
+      <swiper
+        class="card-swiper"
+        current="{{index}}"
+        bindchange="onSwiperChange"
+        duration="200"
+        easing-function="easeOutCubic"
+        displayMultipleItems="1"
+        skip-hidden-item-layout="{{false}}"
+      >
+        <swiper-item wx:for="{{list}}" wx:key="index">
+          <view class="card {{currentDeckId === 'japanese' ? 'ja-deck' : ''}}" bindtap="toggleAnswer">
+            <view class="card-header">
+              <text class="progress">{{index + 1}} / {{total}}</text>
+              <view class="header-right">
+                <view wx:if="{{ratings[index] === 'right'}}" class="rating-badge rating-right">✓</view>
+                <view wx:elif="{{ratings[index] === 'wrong'}}" class="rating-badge rating-wrong">✕</view>
+                <view wx:else class="rating-badge rating-none">-</view>
+              </view>
+            </view>
+
+            <view class="card-body">
+              <!-- 代码视图 -->
+              <block wx:if="{{currentIndex === index && showAnswer === 2 && item.code}}">
+                <scroll-view scroll-y class="code-scroll" catchtap="">
+                  <view class="code-container">
+                    <view class="code-lang-tag">C++</view>
+                    <rich-text class="code-rich" nodes="{{codeNodes}}"></rich-text>
+                  </view>
+                </scroll-view>
+              </block>
+              <!-- 答案/思路视图 -->
+              <block wx:elif="{{currentIndex === index && showAnswer === 1}}">
+                <scroll-view scroll-y class="answer-scroll">
+                  <text class="a-text">{{item.a}}</text>
+                </scroll-view>
+              </block>
+              <!-- 题面视图 -->
+              <block wx:else>
+                <scroll-view scroll-y class="question-scroll">
+                  <text wx:if="{{item.category}}" class="q-category-tag">{{item.category}}</text>
+                  <text class="q-text">{{item.q}}</text>
+                </scroll-view>
+              </block>
+            </view>
+
+            <view class="card-footer">
+              <text class="hint" wx:if="{{currentIndex === index && showAnswer === 2}}">点击返回题面</text>
+              <text class="hint" wx:elif="{{currentIndex === index && showAnswer === 1}}">点击返回题面</text>
+              <text class="hint" wx:else>点击查看答案</text>
+              <text class="code-link" wx:if="{{currentIndex === index && showAnswer === 1 && item.code}}" catchtap="showCode">📝 查看代码</text>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+
+      <cover-view class="float-shuffle" bindtap="shuffleList">🔀</cover-view>
+      <cover-view class="float-menu" bindtap="showMenu">⋮</cover-view>
+      <cover-view class="float-feedback" bindtap="goFeedback">反馈</cover-view>
+      <cover-view class="float-tts" bindtap="playTTS" wx:if="{{hasTTS}}">🔊</cover-view>
+    </view>
+  </block>
 
   <!-- 来源 -->
   <view class="source-bar">
@@ -101,9 +155,23 @@
   <!-- 底部操作栏 -->
   <view class="toolbar">
     <view class="tool-btn circle" catchtap="goPrev"><text class="arrow">←</text></view>
-    <view class="tool-btn pill wrong" catchtap="markWrong"><text class="icon-x">✕</text><text class="count">{{wrongCount}}</text></view>
-    <view class="tool-btn pill rate-btn" catchtap="showRatingPanel"><text class="rate-icon">★</text><text class="count">评分</text></view>
-    <view class="tool-btn pill right" catchtap="markRight"><text class="count">{{rightCount}}</text><text class="icon-ok">✓</text></view>
+    <block wx:if="{{!isQuizMode}}">
+      <view class="tool-btn pill wrong {{currentRating === 'wrong' ? 'wrong-active' : ''}}" catchtap="markWrong">
+        <text class="icon-x">✕</text>
+        <text class="count">不会</text>
+      </view>
+      <view class="tool-btn pill right {{currentRating === 'right' ? 'right-active' : ''}}" catchtap="markRight">
+        <text class="icon-ok">✓</text>
+        <text class="count">掌握</text>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="quiz-score-bar">
+        <text class="quiz-score-text {{quizCorrect ? 'score-correct' : quizAnswered ? 'score-wrong' : ''}}">
+          {{quizAnswered ? (quizCorrect ? '✓ 正确' : '✕ 错误') : '请选择答案'}}
+        </text>
+      </view>
+    </block>
     <view class="tool-btn circle" catchtap="goNext"><text class="arrow">→</text></view>
   </view>
 </view>

@@ -1,0 +1,212 @@
+[
+  {
+    "q": "如果你想表达\"我去电影院\"，在法语中应该如何正确组合介词 à 和定冠词 le？",
+    "options": ["Je vais a le cinéma.", "Je vais du cinéma.", "Je vais la cinéma.", "Je vais au cinéma."],
+    "answer": 3,
+    "hint": "介词 à 与阳性定冠词 le 需要缩合为 au（à + le = au）。",
+    "pronunciation": true
+  },
+  {
+    "q": "法语中，位于词尾的字母 e 通常如何发音？",
+    "options": ["发 /e/ 音", "发 /ə/ 音", "通常不发音", "发 /ɛ/ 音"],
+    "answer": 2,
+    "hint": "法语词尾的 e 通常是不发音的（哑音 e）。",
+    "pronunciation": false
+  },
+  {
+    "q": "根据\"长发丽人\"口诀，以下哪组辅音字母在词尾通常需要发音？",
+    "options": ["s, t, p, x", "c, f, l, r", "b, d, g, n", "m, n, p, q"],
+    "answer": 1,
+    "hint": "\"长发丽人\"对应 c(长)、f(发)、l(丽)、r(人)，这四个辅音在词尾一般发音。",
+    "pronunciation": false
+  },
+  {
+    "q": "法语字母组合 ou 的发音是什么？",
+    "options": ["/o/", "/u/（类似汉语拼音 u）", "/au/", "/ɔ/"],
+    "answer": 1,
+    "hint": "ou 组合发 /u/ 音，类似汉语拼音中的 u。",
+    "pronunciation": false
+  },
+  {
+    "q": "法语字母组合 oi 的发音是什么？",
+    "options": ["/oi/", "/wa/", "/wi/", "/ai/"],
+    "answer": 1,
+    "hint": "oi 在法语中发 /wa/ 音。",
+    "pronunciation": false
+  },
+  {
+    "q": "法语字母组合 ch 的发音最接近英语中的哪个音？",
+    "options": ["/tʃ/（如 church）", "/k/（如 chemistry）", "/ʃ/（如 ship）", "/x/（如 loch）"],
+    "answer": 2,
+    "hint": "法语的 ch 发 /ʃ/ 音，类似英语的 sh。",
+    "pronunciation": false
+  },
+  {
+    "q": "动词 parler（说话）的 je 变位形式是什么？",
+    "options": ["parles", "parle", "parlons", "parlez"],
+    "answer": 1,
+    "hint": "第一组动词 -er 的 je 变位去掉 -er 加 -e：parle。",
+    "pronunciation": true
+  },
+  {
+    "q": "动词 parler 的 nous 变位形式是什么？",
+    "options": ["parlons", "parlez", "parlent", "parles"],
+    "answer": 0,
+    "hint": "nous 对应的词尾是 -ons：parlons。",
+    "pronunciation": true
+  },
+  {
+    "q": "动词 parler 的 ils/elles 变位形式中，词尾 -ent 的发音特点是什么？",
+    "options": ["发 /ɑ̃/ 音", "发 /ɛ/ 音", "完全不发音", "发 /ən/ 音"],
+    "answer": 2,
+    "hint": "动词变位中第三人称复数的词尾 -ent 完全不发音。",
+    "pronunciation": false
+  },
+  {
+    "q": "动词 faire（做）的 vous 变位形式是什么？",
+    "options": ["faisez", "faites", "faisses", "faisons"],
+    "answer": 1,
+    "hint": "faire 是不规则动词，vous 形式为 faites（注意不是 faisez）。",
+    "pronunciation": true
+  },
+  {
+    "q": "动词 faire 的 ils/elles 变位形式是什么？",
+    "options": ["faisent", "fairent", "font", "faient"],
+    "answer": 2,
+    "hint": "faire 的 ils/elles 变位是不规则形式 font。",
+    "pronunciation": true
+  },
+  {
+    "q": "动词 aller（去）的 je 变位形式是什么？",
+    "options": ["alle", "va", "vais", "aille"],
+    "answer": 2,
+    "hint": "aller 是不规则动词，je 形式为 vais。",
+    "pronunciation": true
+  },
+  {
+    "q": "动词 aller 的 ils/elles 变位形式是什么？",
+    "options": ["allent", "vont", "vaient", "allont"],
+    "answer": 1,
+    "hint": "aller 的 ils/elles 变位是不规则形式 vont。",
+    "pronunciation": true
+  },
+  {
+    "q": "动词 vouloir（想要）的 je 变位形式是什么？",
+    "options": ["voule", "voulais", "veux", "voulus"],
+    "answer": 2,
+    "hint": "vouloir 的 je 变位为 veux。",
+    "pronunciation": true
+  },
+  {
+    "q": "法语中的不定冠词，阳性单数、阴性单数、复数分别是？",
+    "options": ["le, la, les", "un, une, des", "du, de la, des", "ce, cette, ces"],
+    "answer": 1,
+    "hint": "不定冠词：un（阳性单数）、une（阴性单数）、des（复数）。",
+    "pronunciation": true
+  },
+  {
+    "q": "法语中的定冠词，阳性单数、阴性单数、复数分别是？",
+    "options": ["un, une, des", "le, la, les", "du, de la, des", "mon, ma, mes"],
+    "answer": 1,
+    "hint": "定冠词：le（阳性单数）、la（阴性单数）、les（复数）。",
+    "pronunciation": true
+  },
+  {
+    "q": "介词 de 与定冠词 le 缩合后变成什么？",
+    "options": ["del", "de le", "du", "dé"],
+    "answer": 2,
+    "hint": "de + le 缩合为 du。",
+    "pronunciation": true
+  },
+  {
+    "q": "介词 à 与定冠词 les 缩合后变成什么？",
+    "options": ["à les", "ales", "aus", "aux"],
+    "answer": 3,
+    "hint": "à + les 缩合为 aux。",
+    "pronunciation": true
+  },
+  {
+    "q": "主语为 Je 时，物主形容词（阳性单数、阴性单数、复数）分别是？",
+    "options": ["ton, ta, tes", "mon, ma, mes", "son, sa, ses", "notre, notre, nos"],
+    "answer": 1,
+    "hint": "Je 对应的物主形容词：mon（阳性单数）、ma（阴性单数）、mes（复数）。",
+    "pronunciation": true
+  },
+  {
+    "q": "主语为 Tu 时，物主形容词（阳性单数、阴性单数、复数）分别是？",
+    "options": ["mon, ma, mes", "son, sa, ses", "ton, ta, tes", "votre, votre, vos"],
+    "answer": 2,
+    "hint": "Tu 对应的物主形容词：ton（阳性单数）、ta（阴性单数）、tes（复数）。",
+    "pronunciation": true
+  },
+  {
+    "q": "\"le musée\" 的中文意思是什么？",
+    "options": ["图书馆", "博物馆", "剧院", "体育馆"],
+    "answer": 1,
+    "hint": "le musée = 博物馆。",
+    "pronunciation": false
+  },
+  {
+    "q": "\"la natation\" 的中文意思是什么？",
+    "options": ["散步", "跑步", "游泳", "自行车"],
+    "answer": 2,
+    "hint": "la natation = 游泳。",
+    "pronunciation": false
+  },
+  {
+    "q": "\"la randonnée\" 的中文意思是什么？",
+    "options": ["游泳", "溜冰", "慢跑", "徒步/远足"],
+    "answer": 3,
+    "hint": "la randonnée = 徒步/远足。",
+    "pronunciation": false
+  },
+  {
+    "q": "\"des lunettes\" 的中文意思是什么？",
+    "options": ["手表", "剪刀", "眼镜", "铅笔盒"],
+    "answer": 2,
+    "hint": "des lunettes = 眼镜（注意法语中眼镜是复数形式）。",
+    "pronunciation": false
+  },
+  {
+    "q": "如何用法语询问\"你叫什么名字？\"（Vous 形式）",
+    "options": ["Quel est votre nom ?", "Comment vous vous appelez ?", "Vous êtes qui ?", "Comment tu t'appelles ?"],
+    "answer": 1,
+    "hint": "Vous 形式的正式问法：Comment vous vous appelez ?",
+    "pronunciation": true
+  },
+  {
+    "q": "如何用法语询问\"你多大年纪？\"",
+    "options": ["Quel âge tu as ?", "Combien d'années avez-vous ?", "Vous avez quel âge ?", "Vous êtes quel âge ?"],
+    "answer": 2,
+    "hint": "标准表达：Vous avez quel âge ? 注意用 avoir（有）而不是 être（是）。",
+    "pronunciation": true
+  },
+  {
+    "q": "法语连词 \"mais\" 的中文意思是什么？",
+    "options": ["因为", "所以", "但是", "而且"],
+    "answer": 2,
+    "hint": "mais = 但是，表示转折关系。",
+    "pronunciation": false
+  },
+  {
+    "q": "在法语否定句中，表达\"不再……\"使用哪两个词？",
+    "options": ["ne ... pas", "ne ... plus", "ne ... jamais", "ne ... rien"],
+    "answer": 1,
+    "hint": "ne ... plus 表示\"不再……\"。ne ... pas 是一般否定，ne ... jamais 是\"从不\"，ne ... rien 是\"什么都不\"。",
+    "pronunciation": true
+  },
+  {
+    "q": "\"J'aime la natation, mais je déteste le footing.\" 的中文意思是？",
+    "options": ["我喜欢跑步，但我讨厌游泳。", "我喜欢游泳，但我讨厌慢跑。", "我喜欢远足，但我讨厌游泳。", "我喜欢游泳，也喜欢慢跑。"],
+    "answer": 1,
+    "hint": "aimer = 喜欢，natation = 游泳，détester = 讨厌，footing = 慢跑，mais = 但是。",
+    "pronunciation": false
+  },
+  {
+    "q": "\"去游泳馆\"的法语表达 \"Je vais _____ piscine.\" 中，空格处应填？",
+    "options": ["au", "à la", "à le", "du"],
+    "answer": 1,
+    "hint": "piscine（游泳馆）是阴性名词，所以用 à la（介词 à + 阴性定冠词 la，不缩合）。",
+    "pronunciation": true
+  }
+]
